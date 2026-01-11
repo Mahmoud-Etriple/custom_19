@@ -12,7 +12,7 @@
 
     <record id="account.group_account_basic" model="res.groups">
         <field name="name">Invoicing &amp; Banks</field>
-        <field name="category_id" ref="base.module_category_accounting_accounting"/>
+<!--        <field name="category_id" ref="base.module_category_accounting_accounting"/>-->
     </record>
 
     <record id="account.group_account_manager" model="res.groups">
