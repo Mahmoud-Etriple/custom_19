@@ -14,7 +14,7 @@ It gives the Administrator user access to important invoicing features such as b
 
 """,
     'website': 'https://www.odoo.com/app/accounting',
-    'depends': ['account', 'mail_enterprise', 'web_tour', 'base'],
+    'depends': ['account', 'mail_enterprise', 'web_tour'],
     'data': [
         'data/ir_cron.xml',
         'data/digest_data.xml',
