@@ -14,6 +14,7 @@ from typing import NamedTuple
 from werkzeug.exceptions import BadRequest, Forbidden
 
 from odoo import conf, fields, http, _
+
 from odoo.exceptions import MissingError
 from odoo.http import request, content_disposition
 from odoo.osv import expression

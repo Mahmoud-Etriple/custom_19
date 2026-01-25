@@ -848,24 +848,24 @@ class AccountMoveLine(models.Model):
             self.env['res.currency']._field_to_sql(currency_alias, 'decimal_places', query),
         )
 
-    def _read_group_groupby(self, groupby_spec, query):
-        # enable grouping by :abs_rounded on fields, which is useful when trying
-        # to match positive and negative amounts
-        if ':' in groupby_spec:
-            fname, method = groupby_spec.split(':')
-            if method == 'abs_rounded':
-                # rounds with the used currency settings
-                currency_alias = query.make_alias(self._table, 'currency_id')
-                query.add_join('LEFT JOIN', currency_alias, 'res_currency', SQL(
-                    "%s = %s",
-                    self._field_to_sql(self._table, 'currency_id', query),
-                    SQL.identifier(currency_alias, 'id'),
-                ))
-
-                return SQL(
-                    'ROUND(ABS(%s), %s)',
-                    self._field_to_sql(self._table, fname, query),
-                    self.env['res.currency']._field_to_sql(currency_alias, 'decimal_places', query),
-                )
-
-        return super()._read_group_groupby(groupby_spec, query)
+    # def _read_group_groupby(self, groupby_spec, query):
+    #     # enable grouping by :abs_rounded on fields, which is useful when trying
+    #     # to match positive and negative amounts
+    #     if ':' in groupby_spec:
+    #         fname, method = groupby_spec.split(':')
+    #         if method == 'abs_rounded':
+    #             # rounds with the used currency settings
+    #             currency_alias = query.make_alias(self._table, 'currency_id')
+    #             query.add_join('LEFT JOIN', currency_alias, 'res_currency', SQL(
+    #                 "%s = %s",
+    #                 self._field_to_sql(self._table, 'currency_id', query),
+    #                 SQL.identifier(currency_alias, 'id'),
+    #             ))
+    #
+    #             return SQL(
+    #                 'ROUND(ABS(%s), %s)',
+    #                 self._field_to_sql(self._table, fname, query),
+    #                 self.env['res.currency']._field_to_sql(currency_alias, 'decimal_places', query),
+    #             )
+    #
+    #     return super()._read_group_groupby(groupby_spec, query)

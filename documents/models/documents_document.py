@@ -18,7 +18,9 @@ import odoo
 from odoo import _, api, Command, fields, models
 from odoo.exceptions import AccessError, UserError, ValidationError
 from odoo.osv import expression
-from odoo.tools import groupby, image_process, SQL, create_index
+from odoo.tools import groupby, SQL, create_index
+from odoo.tools.image import image_process
+
 from odoo.tools.mimetypes import get_extension
 from odoo.tools.misc import clean_context
 from odoo.tools.pdf import PdfFileReader
