@@ -1,0 +1,181 @@
+<data>
+    <record id="firm_contract_form" model="ir.ui.view">
+        <field name="name">firm.contract.form</field>
+        <field name="model">firm.contract</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="state" widget="statusbar" />
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="partner_id"/>
+                            <field name="parent_id"/>
+                            <field name="description"/>
+                        </group>
+                        <group>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                            <field name="company_type"/>
+                            <field name="person_legal_form" invisible="company_type != 'person'"/>
+                            <field name="legal_form" invisible="company_type == 'person'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="documents_alerts" string="Documents / Alerts">
+                            <!-- add  context="{'default_field' : field}" to set default value -->
+                            <field name="firm_document_ids">
+                                <list editable="bottom">
+                                    <!-- add  domain="[('id','=',parent.field)]" to set default domain -->
+                                    <field name="name"/>
+                                    <field name="document_type_id"/>
+                                    <field name="issuing_office_id"/>
+                                    <field name="state"/>
+                                    <field name="last_update_date"/>
+                                    <field name="alert_days"/>
+                                    <field name="alert_users_ids" widget="many2many_tags" />
+                                    <field name="folder_path"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="services_pricing" string="Services / Pricing">
+                            <!-- add  context="{'default_field' : field}" to set default value -->
+                            <field name="firm_services_ids">
+                                <list editable="bottom">
+                                    <!-- add  domain="[('id','=',parent.field)]" to set default domain -->
+                                    <field name="category_id"/>
+                                    <field name="product_id"/>
+                                    <field name="uom_id"/>
+                                    <field name="quantity"/>
+                                    <field name="price"/>
+                                    <field name="total"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page name="tax_gates" string="Tax Gates">
+                            <!-- add  context="{'default_field' : field}" to set default value -->
+                            <field name="firm_tax_ids">
+                                <list editable="bottom">
+                                    <!-- add  domain="[('id','=',parent.field)]" to set default domain -->
+                                    <field name="gate_link"/>
+                                    <field name="user_name"/>
+                                    <field name="password"/>
+                                </list>
+                            </field>
+                        </page>
+
+
+                    </notebook>
+                    
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="firm_contract_tree" model="ir.ui.view">
+        <field name="name">firm.contract.tree</field>
+        <field name="model">firm.contract</field>
+        <!--<field name="field_parent">children_ids if_want_to_add_Childs</field>-->
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="company_type"/>
+            </list>
+        </field>
+    </record>
+
+<!--    <record id="firm_contract_search" model="ir.ui.view">-->
+<!--        <field name="name">firm.contract.search</field>-->
+<!--        <field name="model">firm.contract</field>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <search>-->
+<!--                <field name="name"/>-->
+<!--                <field name="partner_id"/>-->
+<!--                <field name="start_date"/>-->
+<!--                <field name="end_date"/>-->
+<!--                <field name="company_type"/>-->
+<!--                <filter string="Active" name="filter_active" domain="[('active','=',True)]"/>-->
+<!--                <filter string="Archived" name="filter_inactive" domain="[('active','=',False)]"/>-->
+<!--                <group expand="0" string="Group By">-->
+<!--                    <filter string="Partner" name="group_partner_id" context="{'group_by':'partner_id'}"/>-->
+<!--                    <filter string="Start Date" name="group_start_date" context="{'group_by':'start_date'}"/>-->
+<!--                    <filter string="End Date" name="group_end_date" context="{'group_by':'end_date'}"/>-->
+<!--                    <filter string="Company Type" name="group_company_type" context="{'group_by':'company_type'}"/>-->
+<!--                </group>-->
+<!--            </search>-->
+<!--        </field>-->
+<!--    </record>-->
+
+    <record id="firm_document_type_tree" model="ir.ui.view">
+        <field name="name">firm.document.type.tree</field>
+        <field name="model">firm.document.type</field>
+        <!--<field name="field_parent">children_ids if_want_to_add_Childs</field>-->
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="name"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="firm_document_type_action" model="ir.actions.act_window">
+        <field name="name">Firm Document Type</field>
+        <field name="res_model">firm.document.type</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="issuing_office_tree" model="ir.ui.view">
+        <field name="name">firm.issuing.office.tree</field>
+        <field name="model">issuing.office</field>
+        <!--<field name="field_parent">children_ids if_want_to_add_Childs</field>-->
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="name"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="issuing_office_action" model="ir.actions.act_window">
+        <field name="name">Issuing Office</field>
+        <field name="res_model">issuing.office</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="firm_contract_action" model="ir.actions.act_window">
+        <field name="name">Firm Contract</field>
+        <field name="res_model">firm.contract</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    
+    <menuitem id="firms_menu" 
+              name="Firms" />
+    
+    <menuitem id="firm_contract_menu" 
+              name="Firm Contract" 
+              action="firm_contract_action" 
+              parent="firms_menu" 
+              sequence="10"/>
+
+    <menuitem id="configuration_menu"
+              name="Configuration"
+              parent="firms_menu"
+              sequence="100"/>
+
+    <menuitem id="firm_document_type_menu"
+              name="Firm Document Type"
+              action="firm_document_type_action"
+              parent="configuration_menu"
+              sequence="10"/>
+
+    <menuitem id="issuing_office_menu"
+              name="Issuing Office"
+              action="issuing_office_action"
+              parent="configuration_menu"
+              sequence="20"/>
+
+</data>

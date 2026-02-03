@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+firm.contract,firm.contract,model_firm_contract,,1,1,1,1
+firm.document,firm.document,model_firm_document,,1,1,1,1
+firm.tax,firm.tax,model_firm_tax,,1,1,1,1
+firm.services,firm.services,model_firm_services,,1,1,1,1
+firm.document.type,firm.document.type,model_firm_document_type,,1,1,1,1
+issuing_office,issuing_office,model_issuing_office,,1,1,1,1

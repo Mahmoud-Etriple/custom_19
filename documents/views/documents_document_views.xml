@@ -1,41 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <record id="document_view_search" model="ir.ui.view">
-        <field name="name">Document search view</field>
-        <field name="model">documents.document</field>
-        <field name="arch" type="xml">
-            <search string="Documents">
-                <field name="name" string="Name / Extension"/>
-                <field name="tag_ids"/>
-                <field name="owner_id"/>
-                <field name="partner_id" string="Contact"/>
-                <field name="index_content"/>
-                <field name="create_uid" string="Created by"/>
-                <filter string="My Documents" name="my_documents_filter" domain="['|', ('owner_id', '=', uid), ('partner_id.user_ids', '=', uid)]"/>
-                <filter string="My Activities" name="my_activities_filter" domain="[('activity_user_id','=',uid)]"/>
-                <filter string="Starred" name="my_favorites_filter" domain="[('favorited_ids', 'in', uid)]"/>
-                <separator/>
-                <filter string="Documents" name="pdf_doc" domain="[('type', '!=', 'folder')]"/>
-                <filter string="Folders" name="pdf_doc" domain="[('type', '=', 'folder')]"/>
-                <filter string="Hide shortcuts" name="no_shortcuts" domain="[('shortcut_document_id', '=', False)]"/>
-                <separator/>
-                <filter string="Requested Documents" name="requested_filter" domain="[('type', '=', 'binary'), ('attachment_id', '=', False)]"/>
-                <separator/>
-                <field name="type"/>
-                <group expand="0" string="Group By">
-                    <filter string="Contact" name="filter_partner_id" domain="[]" context="{'group_by': 'partner_id'}"/>
-                    <filter string="Owner" name="filter_owner_id" domain="[]" context="{'group_by': 'owner_id'}"/>
-                    <filter string="Type" name="filter_type" domain="[]" context="{'group_by': 'type'}"/>
-                    <filter string="Model" name="filter_res_model" domain="[]" context="{'group_by': 'res_model'}"/>
-                    <filter string="Creation Date" name="filter_create_date" domain="[]" context="{'group_by':'create_date'}"/>
-                    <filter string="File Extension" name="filter_file_extension" domain="[]" context="{'group_by': 'file_extension'}"/>
-                </group>
-                <searchpanel class="o_documents_search_panel">
-                    <field name="folder_id" string="Folders"/>
-                </searchpanel>
-            </search>
-        </field>
-    </record>
+<!--    <record id="document_view_search" model="ir.ui.view">-->
+<!--        <field name="name">Document search view</field>-->
+<!--        <field name="model">documents.document</field>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <search string="Documents">-->
+<!--                <field name="name" string="Name / Extension"/>-->
+<!--                <field name="tag_ids"/>-->
+<!--                <field name="owner_id"/>-->
+<!--                <field name="partner_id" string="Contact"/>-->
+<!--                <field name="index_content"/>-->
+<!--                <field name="create_uid" string="Created by"/>-->
+<!--                <filter string="My Documents" name="my_documents_filter" domain="['|', ('owner_id', '=', uid), ('partner_id.user_ids', '=', uid)]"/>-->
+<!--                <filter string="My Activities" name="my_activities_filter" domain="[('activity_user_id','=',uid)]"/>-->
+<!--                <filter string="Starred" name="my_favorites_filter" domain="[('favorited_ids', 'in', uid)]"/>-->
+<!--                <separator/>-->
+<!--                <filter string="Documents" name="pdf_doc" domain="[('type', '!=', 'folder')]"/>-->
+<!--                <filter string="Folders" name="pdf_doc" domain="[('type', '=', 'folder')]"/>-->
+<!--                <filter string="Hide shortcuts" name="no_shortcuts" domain="[('shortcut_document_id', '=', False)]"/>-->
+<!--                <separator/>-->
+<!--                <filter string="Requested Documents" name="requested_filter" domain="[('type', '=', 'binary'), ('attachment_id', '=', False)]"/>-->
+<!--                <separator/>-->
+<!--                <field name="type"/>-->
+<!--                <group expand="0" string="Group By">-->
+<!--                    <filter string="Contact" name="filter_partner_id" domain="[]" context="{'group_by': 'partner_id'}"/>-->
+<!--                    <filter string="Owner" name="filter_owner_id" domain="[]" context="{'group_by': 'owner_id'}"/>-->
+<!--                    <filter string="Type" name="filter_type" domain="[]" context="{'group_by': 'type'}"/>-->
+<!--                    <filter string="Model" name="filter_res_model" domain="[]" context="{'group_by': 'res_model'}"/>-->
+<!--                    <filter string="Creation Date" name="filter_create_date" domain="[]" context="{'group_by':'create_date'}"/>-->
+<!--                    <filter string="File Extension" name="filter_file_extension" domain="[]" context="{'group_by': 'file_extension'}"/>-->
+<!--                </group>-->
+<!--                <searchpanel class="o_documents_search_panel">-->
+<!--                    <field name="folder_id" string="Folders"/>-->
+<!--                </searchpanel>-->
+<!--            </search>-->
+<!--        </field>-->
+<!--    </record>-->
 
     <record id="document_view_kanban" model="ir.ui.view">
         <field name="name">documents.document kanban</field>
@@ -249,44 +249,44 @@
         </field>
     </record>
 
-    <record id="document_view_form_details" model="ir.ui.view">
-        <field name="name">documents form details</field>
-        <field name="model">documents.document</field>
-        <field name="priority" eval="32"/>
-        <field name="arch" type="xml">
-            <form create="false">
-                <notebook>
-                    <page string="General">
-                        <group>
-                            <field name="name" readonly="not context.get('editable')"/>
-                            <field name="owner_id" readonly="not context.get('editable')"/>
-                            <field name="partner_id" readonly="not context.get('editable')"/>
-                            <field name="file_size" readonly="True" invisible="type == 'folder'"/>
-                            <field name="folder_id" readonly="True" widget="documents_folder_many2one"/>
-                            <field name="write_date" readonly="True"/>
-                            <field name="create_date" readonly="True"/>
-                            <field name="tag_ids" readonly="not context.get('editable')" widget="many2many_tags"
-                                options="{'color_field': 'color'}" invisible="type == 'folder'"/>
-                            <field name="document_count" readonly="True" invisible="type != 'folder'"/>
-                        </group>
-                    </page>
-                    <page string="Email Upload" invisible="type !='folder' or shortcut_document_id">
-                        <group>
-                            <div class="oe_edit_only oe_inline" name="edit_alias" style="display: inline;" dir="ltr">
-                                <label for="alias_name"/>
-                                <field name="alias_name" placeholder="alias" class="oe_inline" readonly="not context.get('editable')"/>@
-                                <field name="alias_domain_id" class="oe_inline" placeholder="e.g. mycompany.com"
-                                       options="{'no_create': True, 'no_open': True}" readonly="not context.get('editable')"/>
-                                <button name="%(settings_action)d" icon="oi-arrow-right" type="action" invisible="alias_domain_id"
-                                       string="Choose or Configure Email Servers" class="btn btn-sm btn-link"/>
-                            </div>
-                            <field name="alias_tag_ids" readonly="not context.get('editable')" widget="many2many_tags"/>
-                        </group>
-                    </page>
-                </notebook>
-            </form>
-        </field>
-    </record>
+<!--    <record id="document_view_form_details" model="ir.ui.view">-->
+<!--        <field name="name">documents form details</field>-->
+<!--        <field name="model">documents.document</field>-->
+<!--        <field name="priority" eval="32"/>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <form create="false">-->
+<!--                <notebook>-->
+<!--                    <page string="General">-->
+<!--                        <group>-->
+<!--                            <field name="name" />-->
+<!--                            <field name="owner_id" />-->
+<!--                            <field name="partner_id" />-->
+<!--                            <field name="file_size" readonly="True" invisible="type == 'folder'"/>-->
+<!--                            <field name="folder_id" readonly="True" widget="documents_folder_many2one"/>-->
+<!--                            <field name="write_date" readonly="True"/>-->
+<!--                            <field name="create_date" readonly="True"/>-->
+<!--                            <field name="tag_ids"  widget="many2many_tags"-->
+<!--                                options="{'color_field': 'color'}" invisible="type == 'folder'"/>-->
+<!--                            <field name="document_count" readonly="True" invisible="type != 'folder'"/>-->
+<!--                        </group>-->
+<!--                    </page>-->
+<!--                    <page string="Email Upload" invisible="type !='folder' or shortcut_document_id">-->
+<!--                        <group>-->
+<!--                            <div class="oe_edit_only oe_inline" name="edit_alias" style="display: inline;" dir="ltr">-->
+<!--                                <label for="alias_name"/>-->
+<!--                                <field name="alias_name" placeholder="alias" class="oe_inline" />@-->
+<!--                                <field name="alias_domain_id" class="oe_inline" placeholder="e.g. mycompany.com"-->
+<!--                                       options="{'no_create': True, 'no_open': True}" />-->
+<!--&lt;!&ndash;                                <button name="%(settings_action)d" icon="oi-arrow-right" type="action" invisible="alias_domain_id"&ndash;&gt;-->
+<!--&lt;!&ndash;                                       string="Choose or Configure Email Servers" class="btn btn-sm btn-link"/>&ndash;&gt;-->
+<!--                            </div>-->
+<!--                            <field name="alias_tag_ids"  widget="many2many_tags"/>-->
+<!--                        </group>-->
+<!--                    </page>-->
+<!--                </notebook>-->
+<!--            </form>-->
+<!--        </field>-->
+<!--    </record>-->
 
     <record id="document_view_form_rename" model="ir.ui.view">
         <field name="name">Rename form</field>

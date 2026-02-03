@@ -11,7 +11,7 @@ Adds fleet data to documents
     'website': ' ',
     'depends': ['documents', 'fleet'],
     'data': [
-        'data/documents_folder_data.xml',
+        # 'data/documents_folder_data.xml',
         'data/documents_tag_data.xml',
         'data/ir_actions_server_data.xml',
         'data/res_company_data.xml',

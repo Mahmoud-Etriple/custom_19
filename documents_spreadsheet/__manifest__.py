@@ -8,7 +8,7 @@
     'description': 'Documents Spreadsheet',
     'depends': ['documents', 'spreadsheet_edition'],
     'data': [
-        'data/documents_folder_data.xml',
+        # 'data/documents_folder_data.xml',
         'data/res_company_data.xml',
         'security/ir.model.access.csv',
         'security/security.xml',

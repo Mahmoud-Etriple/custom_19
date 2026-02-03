@@ -23,19 +23,19 @@
         </field>
     </record>
 
-    <record id="settings_action" model="ir.actions.act_window">
-        <field name="name">Settings</field>
-        <field name="res_model">res.config.settings</field>
-        <field name="view_mode">form</field>
-        <field name="target">inline</field>
-        <field name="context">{'module': 'general_settings', 'bin_size': False}</field>
-    </record>
+<!--    <record id="settings_action" model="ir.actions.act_window">-->
+<!--        <field name="name">Settings</field>-->
+<!--        <field name="res_model">res.config.settings</field>-->
+<!--        <field name="view_mode">form</field>-->
+<!--        <field name="target">inline</field>-->
+<!--        <field name="context">{'module': 'general_settings', 'bin_size': False}</field>-->
+<!--    </record>-->
 
-    <record id="configuration_action" model="ir.actions.act_window">
-        <field name="name">Settings</field>
-        <field name="res_model">res.config.settings</field>
-        <field name="view_mode">form</field>
-        <field name="target">inline</field>
-        <field name="context">{'module': 'documents', 'bin_size': False}</field>
-    </record>
+<!--    <record id="configuration_action" model="ir.actions.act_window">-->
+<!--        <field name="name">Settings</field>-->
+<!--        <field name="res_model">res.config.settings</field>-->
+<!--        <field name="view_mode">form</field>-->
+<!--        <field name="target">inline</field>-->
+<!--        <field name="context">{'module': 'documents', 'bin_size': False}</field>-->
+<!--    </record>-->
 </odoo>

@@ -12,7 +12,7 @@ option to send products' attachments to the documents app.
     'website': ' ',
     'depends': ['documents', 'product'],
     'data': [
-        'data/documents_folder_data.xml',
+        # 'data/documents_folder_data.xml',
         'data/documents_tag_data.xml',
         'data/ir_actions_server_data.xml',
         'data/res_company_data.xml',
