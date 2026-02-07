@@ -30,6 +30,48 @@ class FirmContract(models.Model):
         related='partner_id.parent_id',
         store=1,
     )
+    vat = fields.Char(
+        related='partner_id.vat',
+        store=1,
+        readonly=0,
+    )
+    street = fields.Char(
+        related='partner_id.street',
+        store=1,
+        readonly=0,
+    )
+
+    street2 = fields.Char(
+        related='partner_id.street2',
+        store=1,
+        readonly=0,
+    )
+
+    city = fields.Char(
+        related='partner_id.city',
+        store=1,
+        readonly=0,
+    )
+
+    state_id = fields.Many2one(
+        related='partner_id.state_id',
+        store=1,
+        readonly=0,
+    )
+
+    zip = fields.Char(
+        related='partner_id.zip',
+        store=1,
+        readonly=0,
+    )
+
+    country_id = fields.Many2one(
+        related='partner_id.country_id',
+        store=1,
+        readonly=0,
+    )
+    responsible_name = fields.Char()
+    responsible_phone = fields.Char()
     start_date = fields.Date()
     end_date = fields.Date()
     company_type = fields.Selection(
@@ -72,6 +114,127 @@ class FirmContract(models.Model):
         'firm_contract_id'
     )
 
+    def action_view_crm(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Opportunity'),
+            'res_model': 'crm.lead',
+            'view_mode': 'list,form',
+            'domain': [('firm_contract_id', '=', self.id)],
+            'context': {
+                'default_firm_contract_id': self.id,
+            },
+        }
+
+    def action_view_expense(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Expenses'),
+            'res_model': 'hr.expense',
+            'view_mode': 'list,form',
+            'domain': [('firm_contract_id', '=', self.id)],
+            'context': {
+                'default_firm_contract_id': self.id,
+            },
+        }
+
+    def action_view_sale(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Sales Orders'),
+            'res_model': 'sale.order',
+            'view_mode': 'list,form',
+            'domain': [('firm_contract_id', '=', self.id)],
+            'context': {
+                'default_firm_contract_id': self.id,
+            },
+        }
+
+    def action_view_project(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Projects'),
+            'res_model': 'project.project',
+            'view_mode': 'list,form',
+            'domain': [('firm_contract_id', '=', self.id)],
+            'context': {
+                'default_firm_contract_id': self.id,
+            },
+        }
+
+
+    def action_view_task(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Tasks'),
+            'res_model': 'project.task',
+            'view_mode': 'list,form',
+            'domain': [('firm_contract_id', '=', self.id)],
+            'context': {
+                'default_firm_contract_id': self.id,
+            },
+        }
+
+
+    def action_view_bill(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Vendor Bills'),
+            'res_model': 'account.move',
+            'view_mode': 'list,form',
+            'domain': [('firm_contract_id', '=', self.id),('move_type', '=', 'in_invoice')],
+            'context': {
+                'default_partner_id': self.id,
+                'default_firm_contract_id': self.id,
+                'default_move_type': 'in_invoice',
+            },
+        }
+
+    def action_view_invoice(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Customer Invoice'),
+            'res_model': 'account.move',
+            'view_mode': 'list,form',
+            'domain': [('firm_contract_id', '=', self.id),('move_type', '=', 'out_invoice')],
+            'context': {
+                'default_partner_id': self.id,
+                'default_firm_contract_id': self.id,
+                'default_move_type': 'out_invoice',
+            },
+        }
+
+
+    def action_cancel(self):
+        """ Action Approve """
+        for rec in self:
+            rec.state = 'cancel'
+
+    def action_approve(self):
+        """ Action Approve """
+        for rec in self:
+            rec.state = 'approve'
+            if rec.firm_services_ids:
+                sale = self.env['sale.order'].create({
+                    'partner_id': rec.partner_id.id,
+                    'firm_contract_id': rec.id
+                })
+                for line in rec.firm_services_ids:
+                    self.env['sale.order.line'].create({
+                        'product_id': line.product_id.id,
+                        'product_uom_qty': line.quantity,
+                        'product_uom_id': line.product_id.uom_id.id,
+                        'price_unit': line.price,
+                        'order_id': sale.id,
+                    })
+
 
 class FirmDocument(models.Model):
     """
@@ -106,6 +269,13 @@ class FirmDocument(models.Model):
     firm_contract_id = fields.Many2one(
         'firm.contract'
     )
+    tag_ids = fields.Many2many(
+        'firm.document.tag'
+    )
+    attachment_ids = fields.Many2many(
+        'ir.attachment'
+    )
+
 
 
 class FirmServices(models.Model):
@@ -115,7 +285,14 @@ class FirmServices(models.Model):
     """
     _name = 'firm.services'
     _description = 'Firm Services'
-
+    
+    scope = fields.Char()
+    project_manager_id = fields.Many2one(
+        'res.users'
+    )
+    assignee_ids = fields.Many2many(
+        'res.users'
+    )
     category_id = fields.Many2one(
         'product.category'
     )
@@ -125,7 +302,8 @@ class FirmServices(models.Model):
     )
     uom_id = fields.Many2one(
         'uom.uom',
-        string='Unit Of Measure'
+        string='Unit Of Measure',
+        related='product_id.uom_id'
     )
     quantity = fields.Float()
     price = fields.Float()

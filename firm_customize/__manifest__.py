@@ -11,7 +11,11 @@
     'depends': [
         'base',
         'sale',
+        'crm',
         'stock',
+        'project',
+        'hr_expense',
+        'sale_project',
     ],
     'data': [
         #'security/security.xml',
@@ -19,6 +23,11 @@
         # 'report/',
         #'wizard/',
         'views/firm_contract.xml',
+        'views/hr_expense.xml',
+        'views/account_move.xml',
+        'views/project.xml',
+        'views/sale_order.xml',
+        'views/crm_lead.xml',
         #'data/',
     ],
     'demo': [

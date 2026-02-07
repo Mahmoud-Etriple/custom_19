@@ -1,0 +1,13 @@
+<data>
+    <record id="inherit_hr_expense_form" model="ir.ui.view">
+        <field name="name">inherit.hr.expense.form</field>
+        <field name="model">hr.expense</field>
+        <!--<field name="groups_id" eval="[(4, ref(''))]"/>-->
+        <field name="inherit_id" ref="hr_expense.hr_expense_view_form"/>
+        <field name="arch" type="xml">
+            <field name="manager_id" position="after">
+                <field name="firm_contract_id"/>
+            </field>
+        </field>
+    </record>
+</data>

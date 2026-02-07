@@ -20,6 +20,20 @@ class FirmDocumentType(models.Model):
     )
 
 
+class FirmDocumentTag(models.Model):
+    """
+        Initialize Firm Document Type:
+         -
+    """
+    _name = 'firm.document.tag'
+    _description = 'Firm Document Tag'
+
+    name = fields.Char(
+        required=True,
+        translate=True,
+    )
+
+
 class IssuingOffice(models.Model):
     """
         Initialize Issuing Office:

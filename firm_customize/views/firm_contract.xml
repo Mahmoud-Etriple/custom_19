@@ -5,15 +5,77 @@
         <field name="arch" type="xml">
             <form>
                 <header>
+                    <button name="action_approve" string="Approve" type="object"
+                            invisible="state != 'draft'"
+                            class="oe_highlight"/>
                     <field name="state" widget="statusbar" />
                 </header>
                 <sheet>
+                    <div name="button_box" class="oe_button_box">
+                        <button name="action_view_crm"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-truck">
+                            <span>Opportunity</span>
+                        </button>
+                        <button name="action_view_expense"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-truck">
+                            <span>Expenses</span>
+                        </button>
+                        <button name="action_view_sale"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-truck">
+                            <span>Sale Orders</span>
+                        </button>
+                        <button name="action_view_project"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-truck">
+                            <span>Projects</span>
+                        </button>
+                        <button name="action_view_task"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-truck">
+                            <span>Tasks</span>
+                        </button>
+                        <button name="action_view_invoice"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-truck">
+                            <span>Customer Invoices</span>
+                        </button>
+                        <button name="action_view_bill"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-truck">
+                            <span>Vendor Bills</span>
+                        </button>
+                    </div>
                     <group>
                         <group>
                             <field name="name"/>
                             <field name="partner_id"/>
                             <field name="parent_id"/>
-                            <field name="description"/>
+                            <field name="vat"/>
+                            <field name="responsible_name"/>
+                            <field name="responsible_phone"/>
+                            <span class="o_form_label o_td_label o_address_type" name="address_name">
+                                <span>Address</span>
+                            </span>
+                            <div class="o_address_format">
+                                <field name="street" placeholder="Street..." class="o_address_street"/>
+                                <field name="street2" placeholder="Street 2..." class="o_address_street"/>
+                                <field name="city" placeholder="City" class="o_address_city"/>
+                                <field name="state_id" placeholder="State" class="o_address_state" options="{'no_open': True, 'no_quick_create': True}" context="{'country_id': country_id, 'default_country_id': country_id, 'zip': zip}"/>
+                                <field name="zip" placeholder="ZIP" class="o_address_zip"/>
+                                <div name="partner_address_country" class="d-flex justify-content-between">
+                                    <field name="country_id" placeholder="Country" class="o_address_country" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/>
+                                </div>
+                            </div>
                         </group>
                         <group>
                             <field name="start_date"/>
@@ -21,6 +83,7 @@
                             <field name="company_type"/>
                             <field name="person_legal_form" invisible="company_type != 'person'"/>
                             <field name="legal_form" invisible="company_type == 'person'"/>
+                            <field name="description"/>
                         </group>
                     </group>
                     <notebook>
@@ -36,6 +99,8 @@
                                     <field name="last_update_date"/>
                                     <field name="alert_days"/>
                                     <field name="alert_users_ids" widget="many2many_tags" />
+                                    <field name="tag_ids" widget="many2many_tags" />
+                                    <field name="attachment_ids" widget="many2many_binary" />
                                     <field name="folder_path"/>
                                 </list>
                             </field>
@@ -45,12 +110,15 @@
                             <field name="firm_services_ids">
                                 <list editable="bottom">
                                     <!-- add  domain="[('id','=',parent.field)]" to set default domain -->
+                                    <field name="scope"/>
                                     <field name="category_id"/>
                                     <field name="product_id"/>
                                     <field name="uom_id"/>
                                     <field name="quantity"/>
                                     <field name="price"/>
                                     <field name="total"/>
+                                    <field name="project_manager_id"/>
+                                    <field name="assignee_ids" widget="many2many_tags"/>
                                 </list>
                             </field>
                         </page>
@@ -129,6 +197,23 @@
         <field name="view_mode">list,form</field>
     </record>
 
+    <record id="firm_document_tag_tree" model="ir.ui.view">
+        <field name="name">firm.document.tag.tree</field>
+        <field name="model">firm.document.tag</field>
+        <!--<field name="field_parent">children_ids if_want_to_add_Childs</field>-->
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="name"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="firm_document_tag_action" model="ir.actions.act_window">
+        <field name="name">Firm Document Tag</field>
+        <field name="res_model">firm.document.tag</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
     <record id="issuing_office_tree" model="ir.ui.view">
         <field name="name">firm.issuing.office.tree</field>
         <field name="model">issuing.office</field>
@@ -169,6 +254,12 @@
     <menuitem id="firm_document_type_menu"
               name="Firm Document Type"
               action="firm_document_type_action"
+              parent="configuration_menu"
+              sequence="10"/>
+
+    <menuitem id="firm_document_tag_menu"
+              name="Firm Document Tag"
+              action="firm_document_tag_action"
               parent="configuration_menu"
               sequence="10"/>
 
