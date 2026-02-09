@@ -13,6 +13,7 @@ class FirmContract(models.Model):
     """
     _name = 'firm.contract'
     _description = 'Firm Contract'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char(
         required=True,
@@ -211,11 +212,15 @@ class FirmContract(models.Model):
             },
         }
 
-
     def action_cancel(self):
         """ Action Approve """
         for rec in self:
             rec.state = 'cancel'
+
+    def action_draft(self):
+        """ Action Approve """
+        for rec in self:
+            rec.state = 'draft'
 
     def action_approve(self):
         """ Action Approve """

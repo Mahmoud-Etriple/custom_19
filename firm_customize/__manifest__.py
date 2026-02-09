@@ -16,6 +16,7 @@
         'project',
         'hr_expense',
         'sale_project',
+        'mail',
     ],
     'data': [
         #'security/security.xml',
