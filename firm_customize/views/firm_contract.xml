@@ -9,7 +9,7 @@
                             invisible="state != 'draft'"
                             class="oe_highlight"/>
                     <button name="action_cancel" string="Cancel" type="object"
-                            invisible="state != 'draft'"
+                            invisible="state == 'cancel'"
                             class="oe_highlight"/>
                     <button name="action_draft" string="Set Draft" type="object"
                             invisible="state != 'cancel'"
@@ -69,7 +69,10 @@
                             <field name="parent_id"/>
                             <field name="vat"/>
                             <field name="responsible_name"/>
+                            <field name="identification_no"/>
                             <field name="responsible_phone"/>
+                            <field name="industry_id"/>
+                            <field name="industry_code"/>
                             <span class="o_form_label o_td_label o_address_type" name="address_name">
                                 <span>Address</span>
                             </span>
@@ -87,10 +90,14 @@
                         <group>
                             <field name="start_date"/>
                             <field name="end_date"/>
+                            <field name="activity_start_date"/>
+                            <field name="activity_year"/>
                             <field name="company_type"/>
                             <field name="person_legal_form" invisible="company_type != 'person'"/>
                             <field name="legal_form" invisible="company_type == 'person'"/>
                             <field name="description"/>
+                            <field name="is_eta"/>
+                            <field name="token_end_date" invisible="not is_eta"/>
                         </group>
                     </group>
                     <notebook>

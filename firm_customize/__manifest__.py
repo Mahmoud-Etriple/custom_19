@@ -17,6 +17,7 @@
         'hr_expense',
         'sale_project',
         'mail',
+        'industry_code',
     ],
     'data': [
         #'security/security.xml',

@@ -71,10 +71,23 @@ class FirmContract(models.Model):
         store=1,
         readonly=0,
     )
+    industry_code = fields.Char(
+        related='partner_id.industry_code',
+        store=1,
+        readonly=0,
+    )
+    industry_id = fields.Many2one(
+        related='partner_id.industry_id',
+        store=1,
+        readonly=0,
+    )
     responsible_name = fields.Char()
+    identification_no = fields.Char()
     responsible_phone = fields.Char()
     start_date = fields.Date()
     end_date = fields.Date()
+    activity_start_date = fields.Date()
+    activity_year = fields.Char()
     company_type = fields.Selection(
         related='partner_id.company_type',
         store=1,
@@ -114,6 +127,8 @@ class FirmContract(models.Model):
         'firm.tax',
         'firm_contract_id'
     )
+    is_eta = fields.Boolean()
+    token_end_date = fields.Date()
 
     def action_view_crm(self):
         self.ensure_one()
