@@ -143,6 +143,26 @@ class FirmContract(models.Model):
             },
         }
 
+    def action_view_firm_calender(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Firm Contract'),
+            'res_model': 'firm.contract',
+            'view_mode': 'calendar',
+            'domain': [('id', '=', self.id)],
+        }
+
+    def action_view_firm_activity(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Firm Contract'),
+            'res_model': 'firm.contract',
+            'view_mode': 'activity',
+            'domain': [('id', '=', self.id)],
+        }
+
     def action_view_expense(self):
         self.ensure_one()
         return {

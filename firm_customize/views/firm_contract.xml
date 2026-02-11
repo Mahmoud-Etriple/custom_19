@@ -61,6 +61,18 @@
                                 icon="fa-pencil-square-o">
                             <span>Vendor Bills</span>
                         </button>
+                        <button name="action_view_firm_calender"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-check">
+                            <span>Calender</span>
+                        </button>
+                        <button name="action_view_firm_activity"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-puzzle-piece">
+                            <span>Activity</span>
+                        </button>
                     </div>
                     <group>
                         <group>
