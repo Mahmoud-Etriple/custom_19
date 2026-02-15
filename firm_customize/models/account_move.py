@@ -16,3 +16,15 @@ class AccountMove(models.Model):
     firm_contract_id = fields.Many2one(
         'firm.contract'
     )
+
+
+class AccountPayment(models.Model):
+    """
+        Inherit Account Move:
+         -
+    """
+    _inherit = 'account.payment'
+
+    firm_contract_id = fields.Many2one(
+        'firm.contract'
+    )

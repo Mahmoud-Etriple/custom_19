@@ -66,6 +66,21 @@ class FirmContract(models.Model):
         readonly=0,
     )
 
+    services_type = fields.Selection(
+        [('accounting', 'Accounting'),
+         ('audit', 'Audit'),
+         ('tax', 'Tax'),
+         ('incorporation', 'Incorporation'),
+         ('consulting', 'Consulting'),
+         ('legal', 'Legal')],
+        default='accounting',
+    )
+    service_type_ids = fields.Many2many(
+        'service.type'
+    )
+    company_law_id = fields.Many2one(
+        'company.law'
+    )
     country_id = fields.Many2one(
         related='partner_id.country_id',
         store=1,
@@ -107,6 +122,7 @@ class FirmContract(models.Model):
     ],
         default='sel_1',
     )
+    contract_doc = fields.Binary()
     description = fields.Html()
     state = fields.Selection(
         [('draft', 'Draft'),
@@ -129,6 +145,16 @@ class FirmContract(models.Model):
     )
     is_eta = fields.Boolean()
     token_end_date = fields.Date()
+
+    @api.model
+    def create(self, vals_list):
+        """
+            Override create method
+             - sequence name
+        """
+        sequence = self.env['ir.sequence'].next_by_code('firm.contract')
+        vals_list.update(name=sequence or '/')
+        return super(FirmContract, self).create(vals_list)
 
     def action_view_crm(self):
         self.ensure_one()
@@ -202,7 +228,6 @@ class FirmContract(models.Model):
             },
         }
 
-
     def action_view_task(self):
         self.ensure_one()
         return {
@@ -216,6 +241,20 @@ class FirmContract(models.Model):
             },
         }
 
+    def action_view_payment(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Payments'),
+            'res_model': 'account.payment',
+            'view_mode': 'list,form',
+            'domain': [('firm_contract_id', '=', self.id)],
+            'context': {
+                'default_firm_contract_id': self.id,
+                'default_payment_type': 'inbound',
+                'default_partner_type': 'customer'
+            },
+        }
 
     def action_view_bill(self):
         self.ensure_one()

@@ -1,0 +1,58 @@
+<data>
+    <record id="inherit_product_category_form" model="ir.ui.view">
+        <field name="name">inherit.product.category.form</field>
+        <field name="model">product.category</field>
+        <!--<field name="groups_id" eval="[(4, ref(''))]"/>-->
+        <field name="inherit_id" ref="product.product_category_form_view"/>
+        <field name="arch" type="xml">
+            <field name="parent_id" position="after">
+                <field name="service_type_id"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="product_category_action" model="ir.actions.act_window">
+        <field name="name">Services Category</field>
+        <field name="res_model">product.category</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="product_template_service_action" model="ir.actions.act_window">
+        <field name="name">Services</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'default_type':'service','default_invoice_policy':'delivery','default_service_tracking':'project_only'}</field>
+
+    </record>
+
+    <record id="res_partner_action" model="ir.actions.act_window">
+        <field name="name">Customers</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="res_partner_menu"
+              name="Customers"
+              action="res_partner_action"
+              parent="firms_menu"
+              sequence="5"/>
+
+    <menuitem id="service_root_menu"
+              name="Services"
+              parent="configuration_menu"
+              sequence="100"/>
+
+    <menuitem id="product_category_menu"
+              name="Services Category"
+              action="product_category_action"
+              parent="service_root_menu"
+              sequence="10"/>
+
+    <menuitem id="product_categoryio_menu"
+              name="Services"
+              action="product_template_service_action"
+              parent="service_root_menu"
+              sequence="20"/>
+
+
+</data>

@@ -1,0 +1,22 @@
+<data>
+    <record id="category_firms" model="ir.module.category" >
+        <field name="name">Firms</field>
+    </record>
+
+    <record id="group_user" model="res.groups">
+        <field name="name">Firms User</field>
+<!--        <field name="category_id" ref="firm_customize.category_firms"/>-->
+    </record>
+
+    <record id="group_supervisor" model="res.groups">
+        <field name="name">Firms Supervisor</field>
+<!--        <field name="category_id" ref="firm_customize.category_firms"/>-->
+    </record>
+
+    <record id="group_admin" model="res.groups">
+        <field name="name">Firms Administrator</field>
+<!--        <field name="category_id" ref="firm_customize.category_firms"/>-->
+    </record>
+
+
+</data>

@@ -20,7 +20,7 @@
         'industry_code',
     ],
     'data': [
-        #'security/security.xml',
+        'security/security.xml',
         'security/ir.model.access.csv',
         # 'report/',
         #'wizard/',
@@ -29,6 +29,7 @@
         'views/account_move.xml',
         'views/project.xml',
         'views/sale_order.xml',
+        'views/product_category.xml',
         'views/crm_lead.xml',
         #'data/',
     ],

@@ -20,6 +20,34 @@ class FirmDocumentType(models.Model):
     )
 
 
+class CompanyLaw(models.Model):
+    """
+        Initialize Firm Document Type:
+         -
+    """
+    _name = 'company.law'
+    _description = 'Company Law'
+
+    name = fields.Char(
+        required=True,
+        translate=True,
+    )
+
+
+class ServiceType(models.Model):
+    """
+        Initialize Firm Document Type:
+         -
+    """
+    _name = 'service.type'
+    _description = 'Service Type'
+
+    name = fields.Char(
+        required=True,
+        translate=True,
+    )
+
+
 class FirmDocumentTag(models.Model):
     """
         Initialize Firm Document Type:

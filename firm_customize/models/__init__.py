@@ -7,4 +7,5 @@ from . import hr_expense
 from . import sale_order
 from . import account_move
 from . import project
+from . import product_category
 

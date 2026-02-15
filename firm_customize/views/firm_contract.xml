@@ -32,6 +32,7 @@
                         </button>
                         <button name="action_view_project"
                                 type="object"
+                                groups="firm_customize.group_admin,firm_customize.group_supervisor"
                                 class="oe_stat_button"
                                 icon="fa-puzzle-piece">
                             <span>Projects</span>
@@ -51,15 +52,24 @@
                         </button>
                         <button name="action_view_invoice"
                                 type="object"
+                                groups="firm_customize.group_admin"
                                 class="oe_stat_button"
                                 icon="fa-pencil-square-o">
                             <span>Customer Invoices</span>
                         </button>
                         <button name="action_view_bill"
                                 type="object"
+                                groups="firm_customize.group_admin"
                                 class="oe_stat_button"
                                 icon="fa-pencil-square-o">
                             <span>Vendor Bills</span>
+                        </button>
+                        <button name="action_view_payment"
+                                type="object"
+                                groups="firm_customize.group_admin"
+                                class="oe_stat_button"
+                                icon="fa-dollar">
+                            <span>Payments</span>
                         </button>
                         <button name="action_view_firm_calender"
                                 type="object"
@@ -77,7 +87,8 @@
                     <group>
                         <group>
                             <field name="name"/>
-                            <field name="partner_id"/>
+                            <field name="service_type_ids" widget="many2many_tags" />
+                            <field name="partner_id" domain="[('customer_rank','&gt;', 0)]"/>
                             <field name="parent_id"/>
                             <field name="vat"/>
                             <field name="responsible_name"/>
@@ -98,6 +109,8 @@
                                     <field name="country_id" placeholder="Country" class="o_address_country" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/>
                                 </div>
                             </div>
+                            <br/>
+                            <field name="description"/>
                         </group>
                         <group>
                             <field name="start_date"/>
@@ -107,9 +120,7 @@
                             <field name="company_type"/>
                             <field name="person_legal_form" invisible="company_type != 'person'"/>
                             <field name="legal_form" invisible="company_type == 'person'"/>
-                            <field name="description"/>
-                            <field name="is_eta"/>
-                            <field name="token_end_date" invisible="not is_eta"/>
+                            <field name="company_law_id" invisible="legal_form in ['sel_1','sel_6']"/>
                         </group>
                     </group>
                     <notebook>
@@ -137,12 +148,12 @@
                                 <list editable="bottom">
                                     <!-- add  domain="[('id','=',parent.field)]" to set default domain -->
                                     <field name="scope"/>
-                                    <field name="category_id"/>
+                                    <field name="category_id" domain="[('service_type_id', 'in', parent.service_type_ids)]"/>
                                     <field name="product_id"/>
                                     <field name="uom_id"/>
                                     <field name="quantity"/>
-                                    <field name="price"/>
-                                    <field name="total"/>
+                                    <field name="price" groups="firm_customize.group_admin"/>
+                                    <field name="total" groups="firm_customize.group_admin"/>
                                     <field name="project_manager_id"/>
                                     <field name="assignee_ids" widget="many2many_tags"/>
                                 </list>
@@ -150,6 +161,10 @@
                         </page>
 
                         <page name="tax_gates" string="Tax Gates">
+                            <group>
+                                <field name="is_eta"/>
+                                <field name="token_end_date" invisible="not is_eta"/>
+                            </group>
                             <!-- add  context="{'default_field' : field}" to set default value -->
                             <field name="firm_tax_ids">
                                 <list editable="bottom">
@@ -160,7 +175,10 @@
                                 </list>
                             </field>
                         </page>
-
+                        <page name="contract_doc" string="Contract Doc" groups="firm_customize.group_admin">
+                            <field name="contract_doc" widget="pdf_viewer"/>
+                        </page>
+                        
 
                     </notebook>
                     
@@ -185,12 +203,22 @@
         <field name="arch" type="xml">
             <list>
                 <field name="name"/>
+                <field name="service_type_ids" widget="many2many_tags" />
                 <field name="partner_id"/>
                 <field name="start_date"/>
                 <field name="end_date"/>
                 <field name="company_type"/>
             </list>
         </field>
+    </record>
+
+    <record id="firm_contract_sequence" model="ir.sequence">
+        <field name="name">Firm Contract</field>
+        <field name="code">firm.contract</field>
+        <field name="prefix">Con/</field>
+        <field name="padding">5</field>
+        <field name="number_next">1</field>
+        <field name="number_increment">1</field>
     </record>
 
 <!--    <record id="firm_contract_search" model="ir.ui.view">-->
@@ -229,6 +257,23 @@
     <record id="firm_document_type_action" model="ir.actions.act_window">
         <field name="name">Firm Document Type</field>
         <field name="res_model">firm.document.type</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="company_law_tree" model="ir.ui.view">
+        <field name="name">company.law.tree</field>
+        <field name="model">company.law</field>
+        <!--<field name="field_parent">children_ids if_want_to_add_Childs</field>-->
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="name"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="company_law_action" model="ir.actions.act_window">
+        <field name="name">Company Law</field>
+        <field name="res_model">company.law</field>
         <field name="view_mode">list,form</field>
     </record>
 
@@ -303,5 +348,11 @@
               action="issuing_office_action"
               parent="configuration_menu"
               sequence="20"/>
+
+    <menuitem id="company_law_menu"
+              name="Company Law"
+              action="company_law_action"
+              parent="configuration_menu"
+              sequence="30"/>
 
 </data>

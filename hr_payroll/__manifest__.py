@@ -10,7 +10,7 @@
     'depends': [
         'hr_work_entry_contract_enterprise',
         'mail',
-        'web_editor',
+        # 'web_editor',
     ],
     'data': [
         'security/hr_payroll_security.xml',
