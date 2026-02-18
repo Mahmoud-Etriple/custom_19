@@ -1,13 +1,3 @@
-# -*- coding: utf-8 -*-
-##############################################################################
-#
-#    OpenERP, Open Source Management Solution
-#    Copyright (C) Wan Buffer Solution (<https://wanbuffer.com/>).
-#
-#    For Module Support : info@wanbuffer.com  or Call : +91 9638442270
-#
-##############################################################################
-# -*- coding: utf-8 -*-
 {
     'name': 'Advanced Task Timer',
     'version': '19.0',
@@ -26,7 +16,7 @@
         'wizard/timer_wizard_view.xml',
         'wizard/end_timer_wizard_view.xml',
     ],
-    'post_init_hook': 'post_init_hook',
+    # 'post_init_hook': 'post_init_hook',
     'assets': {
         'web.assets_backend': [
             'wb_advance_task_timer/static/src/xml/timer_button_popup.xml',

@@ -16,7 +16,7 @@ class FirmContract(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char(
-        required=True,
+        required=False,
         translate=True,
         string='Contract No'
     )
@@ -152,9 +152,10 @@ class FirmContract(models.Model):
             Override create method
              - sequence name
         """
+        res = super(FirmContract, self).create(vals_list)
         sequence = self.env['ir.sequence'].next_by_code('firm.contract')
-        vals_list.update(name=sequence or '/')
-        return super(FirmContract, self).create(vals_list)
+        res['name'] = sequence
+        return res
 
     def action_view_crm(self):
         self.ensure_one()
@@ -300,6 +301,12 @@ class FirmContract(models.Model):
         """ Action Approve """
         for rec in self:
             rec.state = 'approve'
+            analytic_account_id = False
+            if rec.name:
+                analytic_account_id = self.env['account.analytic.account'].create({
+                    'name': rec.name,
+                    'plan_id': 1
+                })
             if rec.firm_services_ids:
                 sale = self.env['sale.order'].create({
                     'partner_id': rec.partner_id.id,
@@ -312,7 +319,9 @@ class FirmContract(models.Model):
                         'product_uom_id': line.product_id.uom_id.id,
                         'price_unit': line.price,
                         'order_id': sale.id,
+                        'analytic_distribution': {analytic_account_id: 100}
                     })
+                sale.action_confirm()
 
 
 class FirmDocument(models.Model):
