@@ -17,6 +17,14 @@ class ProjectProject(models.Model):
         'firm.contract'
     )
 
+    @api.constrains('reinvoiced_sale_order_id')
+    def _check_reinvoiced_sale_order_id(self):
+        """ Validate reinvoiced_sale_order_id """
+        for rec in self:
+            if rec.reinvoiced_sale_order_id and rec.reinvoiced_sale_order_id.firm_contract_id:
+                rec.firm_contract_id = rec.reinvoiced_sale_order_id.firm_contract_id
+                rec.account_id = rec.reinvoiced_sale_order_id.firm_contract_id.analytic_account_id
+
 
 class ProjectTask(models.Model):
     """

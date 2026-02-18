@@ -145,6 +145,9 @@ class FirmContract(models.Model):
     )
     is_eta = fields.Boolean()
     token_end_date = fields.Date()
+    analytic_account_id = fields.Many2one(
+        'account.analytic.account'
+    )
 
     @api.model
     def create(self, vals_list):
@@ -303,7 +306,7 @@ class FirmContract(models.Model):
             rec.state = 'approve'
             analytic_account_id = False
             if rec.name:
-                analytic_account_id = self.env['account.analytic.account'].create({
+                rec.analytic_account_id = self.env['account.analytic.account'].create({
                     'name': rec.name,
                     'plan_id': 1
                 })
@@ -319,7 +322,7 @@ class FirmContract(models.Model):
                         'product_uom_id': line.product_id.uom_id.id,
                         'price_unit': line.price,
                         'order_id': sale.id,
-                        'analytic_distribution': {analytic_account_id: 100}
+                        'analytic_distribution': {rec.analytic_account_id.id: 100}
                     })
                 sale.action_confirm()
 
