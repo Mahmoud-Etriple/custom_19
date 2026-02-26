@@ -86,15 +86,16 @@ class FirmContract(models.Model):
         store=1,
         readonly=0,
     )
-    industry_code = fields.Char(
-        related='partner_id.industry_code',
-        store=1,
-        readonly=0,
-    )
     industry_id = fields.Many2one(
         related='partner_id.industry_id',
         store=1,
         readonly=0,
+    )
+    industry_code = fields.Char(
+        related='industry_id.code',
+        store=1,
+        readonly=1,
+        string='Industry Code'
     )
     responsible_name = fields.Char()
     identification_no = fields.Char()
@@ -127,6 +128,7 @@ class FirmContract(models.Model):
     state = fields.Selection(
         [('draft', 'Draft'),
          ('approve', 'Approved'),
+         ('done', 'Done'),
          ('cancel', 'Cancelled')],
         default='draft',
         string='Status'
@@ -148,6 +150,21 @@ class FirmContract(models.Model):
     analytic_account_id = fields.Many2one(
         'account.analytic.account'
     )
+
+    service_tag_ids = fields.Many2many(
+        'product.tag',
+        compute='_compute_service_tag_ids'
+    )
+
+    def _compute_service_tag_ids(self):
+        """ Compute service_tag_ids value """
+        for rec in self:
+            rec.service_tag_ids = None
+            products = self.env['product.category'].search([
+                ('service_type_id', 'in', rec.service_type_ids.ids)
+            ])
+            if products:
+                rec.service_tag_ids = products.mapped('service_tag_ids')
 
     @api.model
     def create(self, vals_list):
@@ -294,6 +311,11 @@ class FirmContract(models.Model):
         """ Action Approve """
         for rec in self:
             rec.state = 'cancel'
+
+    def action_done(self):
+        """ Action Approve """
+        for rec in self:
+            rec.state = 'done'
 
     def action_draft(self):
         """ Action Approve """

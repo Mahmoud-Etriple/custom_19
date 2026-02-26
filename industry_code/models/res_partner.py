@@ -14,3 +14,13 @@ class ResPartner(models.Model):
     _inherit = 'res.partner'
 
     industry_code = fields.Char()
+    
+    
+class ResPartnerIndustry(models.Model):
+    """
+        Inherit Res Partner Industry:
+         - 
+    """
+    _inherit = 'res.partner.industry'
+    
+    code = fields.Char()

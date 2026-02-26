@@ -26,3 +26,18 @@ class ProductCategory(models.Model):
     service_type_id = fields.Many2one(
         'service.type'
     )
+
+    service_tag_ids = fields.Many2many(
+        'product.tag',
+        compute='_compute_service_tag_ids'
+    )
+
+    def _compute_service_tag_ids(self):
+        """ Compute service_tag_ids value """
+        for rec in self:
+            rec.service_tag_ids = None
+            products = self.env['product.template'].search([
+                ('categ_id', '=', rec.id)
+            ])
+            if products:
+                rec.service_tag_ids = products.mapped('product_tag_ids')

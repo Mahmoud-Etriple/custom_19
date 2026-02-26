@@ -31,6 +31,7 @@
         'views/sale_order.xml',
         'views/product_category.xml',
         'views/crm_lead.xml',
+        'views/res_partner.xml',
         #'data/',
     ],
     'demo': [

@@ -1,0 +1,7 @@
+<data>
+    <menuitem id="res_partner_industry_menu"
+              name="Industry"
+              action="base.res_partner_industry_action"
+              parent="firm_customize.configuration_menu"
+              sequence="200"/>
+</data>

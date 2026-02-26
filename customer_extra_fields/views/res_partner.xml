@@ -1,0 +1,67 @@
+<data>
+    <record id="inherit_res_partner_form" model="ir.ui.view">
+        <field name="name">inherit.res.partner.form</field>
+        <field name="model">res.partner</field>
+        <!--<field name="groups_id" eval="[(4, ref(''))]"/>-->
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='contact_addresses']" position="after">
+                <page name="customer_info" string="Customer Info">
+                    <group>
+                        <group>
+                            <field name="responsible_name"/>
+                            <field name="identification_no"/>
+                            <field name="responsible_phone"/>
+                            <field name="industry_id"/>
+                            <field name="industry_code"/>
+                        </group>
+                        <group>
+                            <field name="activity_start_date"/>
+                            <field name="activity_year"/>
+                            <field name="legal_form"/>
+                            <field name="company_law_id"/>
+                        </group>
+                    </group>
+
+                </page>
+
+                <page name="tax_gates" string="Tax Gates">
+                    <group>
+                        <field name="is_eta"/>
+                        <field name="token_end_date" invisible="not is_eta"/>
+                    </group>
+                    <!-- add  context="{'default_field' : field}" to set default value -->
+                    <field name="firm_tax_ids">
+                        <list editable="bottom">
+                            <!-- add  domain="[('id','=',parent.field)]" to set default domain -->
+                            <field name="gate_link"/>
+                            <field name="user_name"/>
+                            <field name="password"/>
+                        </list>
+                    </field>
+                </page>
+                <page name="documents_alerts" string="Documents / Alerts">
+                    <!-- add  context="{'default_field' : field}" to set default value -->
+                    <field name="firm_document_ids">
+                        <list editable="bottom">
+                            <!-- add  domain="[('id','=',parent.field)]" to set default domain -->
+                            <field name="name"/>
+                            <field name="document_type_id"/>
+                            <field name="issuing_office_id"/>
+                            <field name="state"/>
+                            <field name="last_update_date"/>
+                            <field name="alert_days"/>
+                            <field name="alert_users_ids" widget="many2many_tags" />
+                            <field name="tag_ids" widget="many2many_tags" />
+                            <field name="attachment_ids" widget="many2many_binary" />
+                            <field name="folder_path"/>
+                        </list>
+                    </field>
+                </page>
+
+            </xpath>
+
+        </field>
+    </record>
+
+</data>
