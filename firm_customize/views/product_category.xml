@@ -35,8 +35,8 @@
     <menuitem id="res_partner_menu"
               name="Customers"
               action="res_partner_action"
-              parent="firms_menu"
-              sequence="5"/>
+              parent="firm_root_contract_menu"
+              sequence="20"/>
 
     <menuitem id="service_root_menu"
               name="Services"

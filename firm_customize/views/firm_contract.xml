@@ -101,8 +101,6 @@
                             <field name="responsible_name"/>
                             <field name="identification_no"/>
                             <field name="responsible_phone"/>
-                            <field name="industry_id"/>
-                            <field name="industry_code"/>
 <!--                            <span class="o_form_label o_td_label o_address_type" name="address_name">-->
 <!--                                <span>Address</span>-->
 <!--                            </span>-->
@@ -128,6 +126,9 @@
                             <field name="person_legal_form" invisible="company_type != 'person'"/>
                             <field name="legal_form" invisible="company_type == 'person'"/>
                             <field name="company_law_id" invisible="legal_form in ['sel_1','sel_6']"/>
+
+                            <field name="industry_id"/>
+                            <field name="industry_code"/>
                         </group>
                     </group>
                     <notebook>
@@ -232,6 +233,7 @@
                 <group name="group_by">
                     <filter name="group_partner_id" string="Partner" context="{'group_by': 'partner_id'}"/>
                     <filter name="group_service_type_ids" string="Service Type" context="{'group_by': 'service_type_ids'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
                 </group>
             </search>
         </field>
@@ -345,10 +347,15 @@
     <menuitem id="firms_menu" 
               name="Firms" />
     
-    <menuitem id="firm_contract_menu" 
+    <menuitem id="firm_root_contract_menu"
               name="Firm Contract" 
-              action="firm_contract_action" 
-              parent="firms_menu" 
+              parent="firms_menu"
+              sequence="10"/>
+
+    <menuitem id="firm_contract_menu"
+              name="Firm Contract"
+              action="firm_contract_action"
+              parent="firm_root_contract_menu"
               sequence="10"/>
 
     <menuitem id="configuration_menu"

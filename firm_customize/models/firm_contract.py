@@ -153,8 +153,15 @@ class FirmContract(models.Model):
 
     service_tag_ids = fields.Many2many(
         'product.tag',
-        compute='_compute_service_tag_ids'
+        # compute='_compute_service_tag_ids'
     )
+
+    @api.onchange('service_type_ids')
+    def _check_service_type_ids(self):
+        """ Validate service_type_ids """
+        for rec in self:
+            if rec.service_type_ids:
+                rec._compute_service_tag_ids()
 
     def _compute_service_tag_ids(self):
         """ Compute service_tag_ids value """
@@ -390,7 +397,6 @@ class FirmDocument(models.Model):
     )
 
 
-
 class FirmServices(models.Model):
     """
         Initialize Firm Services:
@@ -418,7 +424,9 @@ class FirmServices(models.Model):
         string='Unit Of Measure',
         related='product_id.uom_id'
     )
-    quantity = fields.Float()
+    quantity = fields.Float(
+        default=1
+    )
     price = fields.Float()
     total = fields.Float(
         compute='_compute_total'
