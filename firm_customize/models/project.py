@@ -17,6 +17,10 @@ class ProjectProject(models.Model):
         'firm.contract'
     )
 
+    service_type_ids = fields.Many2many(
+        'service.type'
+    )
+
     @api.constrains('reinvoiced_sale_order_id')
     def _check_reinvoiced_sale_order_id(self):
         """ Validate reinvoiced_sale_order_id """
@@ -45,3 +49,10 @@ class ProjectTask(models.Model):
         for rec in self:
             if rec.sale_line_id and rec.sale_line_id.order_id.firm_contract_id:
                 rec.project_id.firm_contract_id = rec.sale_line_id.order_id.firm_contract_id
+                if rec.firm_contract_id:
+                    service = rec.firm_contract_id.firm_services_ids.filtered(lambda x: x.product_id == rec.sale_line_id.product_id)
+                    if service:
+                        rec.project_id.service_type_ids = service.firm_contract_id.service_type_ids.ids
+                        rec.project_id.description = service.scope
+                        rec.project_id.user_id = service.project_manager_id.id
+                        rec.user_ids = service.assignee_ids.ids

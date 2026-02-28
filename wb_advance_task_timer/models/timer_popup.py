@@ -46,8 +46,7 @@ class ProjectTask(models.Model):
         """Start a timer for the current task."""
         self.ensure_one()
 
-        super().action_timer_start()
-        
+
         Timer = self.env['project.task.timer']
         running_timer = Timer.search([
             ('user_id', '=', self.env.user.id),

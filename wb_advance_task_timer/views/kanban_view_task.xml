@@ -1,14 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
+<data>
         <record model="ir.ui.view" id="view_task_kanban_timer">
             <field name="name">project.task.kanban</field>
             <field name="model">project.task</field>
             <field name="inherit_id" ref="project.view_task_kanban"/>
             <field name="arch" type="xml">
-                <templates position="before">
+                <xpath expr="//field[@name='has_project_template']" position="after">
                     <field name="wb_is_timer_running"/>
                     <field name="wb_timer_start_iso"/>
-                </templates>
+                </xpath>
                 <xpath expr="//footer" position="before">
                     <div class="d-flex align-items-center gap-1 mt-1">
                         <button type="object"
@@ -37,4 +36,32 @@
                 </xpath>
             </field>
         </record>
-</odoo>
+    
+        <record id="inherit_project_task_form" model="ir.ui.view">
+            <field name="name">inherit.project.task.form</field>
+            <field name="model">project.task</field>
+            <!--<field name="groups_id" eval="[(4, ref(''))]"/>-->
+            <field name="inherit_id" ref="project.view_task_form2"/>
+            <field name="arch" type="xml">
+                <xpath expr="//header" position="inside">
+
+                    <field name="wb_is_timer_running" invisible="1"/>
+                    <field name="wb_timer_start_iso" invisible="1"/>
+
+                    <button type="object"
+                            name="action_timer_start"
+                            class="btn btn-primary btn-sm"
+                            invisible="wb_is_timer_running">
+                        Start
+                    </button>
+                    <button type="object"
+                            name="action_open_end_timer_wizard"
+                            class="btn btn-secondary btn-sm"
+                            invisible="not wb_is_timer_running">
+                        End
+                    </button>
+                </xpath>
+
+            </field>
+        </record>
+</data>

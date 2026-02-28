@@ -18,8 +18,8 @@
                         <group>
                             <field name="activity_start_date"/>
                             <field name="activity_year"/>
-                            <field name="legal_form"/>
-                            <field name="company_law_id"/>
+                            <field name="legal_form" invisible="company_type == 'person'"/>
+                            <field name="company_law_id" invisible="legal_form in ['sel_1','sel_6']"/>
                         </group>
                     </group>
 

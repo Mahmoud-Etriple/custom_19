@@ -1,9 +1,10 @@
 {
-    'name': 'Advanced Task Timer',
-    'version': '19.0',
-    'category': 'Project',
-    'author': 'Wan Buffer Services',
-    'summary': 'Task time tracking with timer',
+    'name': 'Task Timer',
+    'summary': 'Task Timer',
+    'author': "Add Value For Consulting",
+    'company': 'Add Value For Consulting',
+    'version': '1.0',
+    'license': 'AGPL-3',
     'description': 'Advanced task time tracking with popup-based timer and real-time visibility.',
     'depends': [
         'web',
@@ -28,10 +29,4 @@
         'static/description/Task Timer - 19.png',   # App Store banner
         'static/description/icon.png',     # App icon
     ],
-    'website': 'https://wanbuffer.com',
-    'maintainer': 'Wan Buffer Services',
-    'support': 'info@wanbuffer.com',
-    'installable': True,
-    'application': True,
-    'license': 'LGPL-3',
 }
