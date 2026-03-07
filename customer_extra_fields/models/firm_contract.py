@@ -5,6 +5,7 @@ from dateutil.relativedelta import relativedelta
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
+
 class FirmContract(models.Model):
     """
         Inherit Firm Contract:
@@ -76,10 +77,12 @@ class FirmTax(models.Model):
          -
     """
     _inherit = 'firm.tax'
+    _rec_name = 'gate_name'
 
     partner_id = fields.Many2one(
         'res.partner'
     )
+    gate_name = fields.Char()
 
 
 class FirmDocument(models.Model):

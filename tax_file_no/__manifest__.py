@@ -1,8 +1,8 @@
 
 
 {
-    'name': 'Customer Extra Fields',
-    'summary': 'Customer Extra Fields',
+    'name': 'Tax File No ',
+    'summary': 'Tax File No',
     'author': "Add Value For Consulting",
     'company': 'Add Value For Consulting',
     'version': '1.0',
@@ -11,15 +11,13 @@
     'depends': [
         'base',
         'sale',
-        'tax_file_no',
-        'firm_customize',
     ],
     'data': [
         #'security/security.xml',
         # 'security/ir.model.access.csv',
         # 'report/',
         #'wizard/',
-        'views/res_partner.xml',
+        # 'views/res_partner.xml',
         #'data/',
     ],
     'demo': [

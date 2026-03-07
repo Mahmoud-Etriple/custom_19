@@ -27,7 +27,9 @@ class ProjectProject(models.Model):
         for rec in self:
             if rec.reinvoiced_sale_order_id and rec.reinvoiced_sale_order_id.firm_contract_id:
                 rec.firm_contract_id = rec.reinvoiced_sale_order_id.firm_contract_id
+                analytic = rec.account_id
                 rec.account_id = rec.reinvoiced_sale_order_id.firm_contract_id.analytic_account_id
+                analytic.sudo().unlink()
 
 
 class ProjectTask(models.Model):

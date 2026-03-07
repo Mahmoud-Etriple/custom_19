@@ -92,12 +92,12 @@
                     <group>
                         <group>
                             <field name="name"/>
+                            <field name="partner_id" domain="[('customer_rank','&gt;', 0)]"/>
                             <field name="service_type_ids" widget="many2many_tags" />
                             <field name="service_tag_ids" widget="many2many_tags" />
 
-                            <field name="partner_id" domain="[('customer_rank','&gt;', 0)]"/>
                             <field name="parent_id"/>
-<!--                            <field name="vat"/>-->
+                            <!--                            <field name="vat"/>-->
                             <field name="responsible_name"/>
                             <field name="identification_no"/>
                             <field name="responsible_phone"/>
@@ -386,5 +386,69 @@
               action="company_law_action"
               parent="configuration_menu"
               sequence="30"/>
+
+
+    <record id="firm_document_form" model="ir.ui.view">
+        <field name="name">firm.document.form</field>
+        <field name="model">firm.document</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="document_type_id"/>
+                            <field name="issuing_office_id"/>
+                            <field name="state"/>
+                            <field name="last_update_date" string="End Date"/>
+                            <field name="alert_days"/>
+                        </group>
+                        <group>
+
+                            <field name="alert_users_ids" widget="many2many_tags" />
+                            <field name="tag_ids" widget="many2many_tags" />
+                            <field name="activity_type_id" />
+                            <field name="attachment_ids" widget="many2many_binary" />
+                            <field name="folder_path"/>
+                        </group>
+                    </group>
+
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="firm_document_tree" model="ir.ui.view">
+        <field name="name">firm.document.tree</field>
+        <field name="model">firm.document</field>
+        <!--<field name="field_parent">children_ids if_want_to_add_Childs</field>-->
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="document_type_id"/>
+                <field name="issuing_office_id"/>
+                <field name="state"/>
+                <field name="last_update_date" string="End Date"/>
+                <field name="alert_days"/>
+                <field name="alert_users_ids" widget="many2many_tags" />
+                <field name="tag_ids" widget="many2many_tags" />
+                <field name="activity_type_id" />
+                <field name="attachment_ids" widget="many2many_binary" />
+                <field name="folder_path"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="ir_cron_autocheck_document" model="ir.cron">
+        <field name="name">Firms: Check Firms Document Alert</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="nextcall" eval="(DateTime.now().replace(hour=2, minute=0) + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <field name="model_id" ref="model_firm_document"/>
+        <field name="code">model.action_schedule_document()</field>
+        <field name="state">code</field>
+    </record>
+
 
 </data>

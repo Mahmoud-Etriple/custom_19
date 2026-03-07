@@ -4,6 +4,7 @@ from dateutil.relativedelta import relativedelta
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
+from datetime import timedelta
 
 
 class FirmContract(models.Model):
@@ -139,7 +140,8 @@ class FirmContract(models.Model):
     )
     firm_services_ids = fields.One2many(
         'firm.services',
-        'firm_contract_id'
+        'firm_contract_id',
+        copy=True
     )
     firm_tax_ids = fields.One2many(
         'firm.tax',
@@ -156,12 +158,12 @@ class FirmContract(models.Model):
         # compute='_compute_service_tag_ids'
     )
 
-    @api.onchange('service_type_ids')
-    def _check_service_type_ids(self):
-        """ Validate service_type_ids """
-        for rec in self:
-            if rec.service_type_ids:
-                rec._compute_service_tag_ids()
+    # @api.onchange('service_type_ids')
+    # def _check_service_type_ids(self):
+    #     """ Validate service_type_ids """
+    #     for rec in self:
+    #         if rec.service_type_ids:
+    #             rec._compute_service_tag_ids()
 
     def _compute_service_tag_ids(self):
         """ Compute service_tag_ids value """
@@ -363,6 +365,7 @@ class FirmDocument(models.Model):
     """
     _name = 'firm.document'
     _description = 'Firm Document'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char(
         required=True,
@@ -395,6 +398,33 @@ class FirmDocument(models.Model):
     attachment_ids = fields.Many2many(
         'ir.attachment'
     )
+    activity_type_id = fields.Many2one(
+        'mail.activity.type'
+    )
+
+    def action_send_activity(self):
+        """ Action Send Activity """
+        for rec in self:
+            if rec.alert_users_ids:
+                summary = 'Renew Document For ' + rec.partner_id.name + ' - ' + rec.name
+                for user in rec.alert_users_ids:
+                    rec.activity_schedule(
+                        activity_type_id=rec.activity_type_id.id,
+                        user_id=user.id,
+                        summary=summary,
+                        note=summary,
+                        date_deadline=fields.Date.today()
+                    )
+    def action_schedule_document(self):
+        """ Action Schedule Document """
+        records = self.env['firm.document'].search([
+            ('last_update_date', '!=', False)
+        ])
+        today = fields.Date.today()
+        if records:
+            for record in records:
+                if record.last_update_date + timedelta(days=record.alert_days) >= today:
+                    record.action_send_activity()
 
 
 class FirmServices(models.Model):
