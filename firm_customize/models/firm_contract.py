@@ -401,6 +401,9 @@ class FirmDocument(models.Model):
     activity_type_id = fields.Many2one(
         'mail.activity.type'
     )
+    partner_id = fields.Many2one(
+        'res.partner'
+    )
 
     def action_send_activity(self):
         """ Action Send Activity """
