@@ -429,6 +429,7 @@
                 <field name="document_type_id"/>
                 <field name="issuing_office_id"/>
                 <field name="state"/>
+                <field name="partner_id"/>
                 <field name="last_update_date" string="End Date"/>
                 <field name="alert_days"/>
                 <field name="alert_users_ids" widget="many2many_tags" />
