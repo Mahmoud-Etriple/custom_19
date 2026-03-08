@@ -29,7 +29,7 @@ class ProjectProject(models.Model):
                 rec.firm_contract_id = rec.reinvoiced_sale_order_id.firm_contract_id
                 analytic = rec.account_id
                 rec.account_id = rec.reinvoiced_sale_order_id.firm_contract_id.analytic_account_id
-                analytic.sudo().unlink()
+                analytic.active = False
 
 
 class ProjectTask(models.Model):

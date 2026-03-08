@@ -418,6 +418,7 @@ class FirmDocument(models.Model):
                         note=summary,
                         date_deadline=fields.Date.today()
                     )
+
     def action_schedule_document(self):
         """ Action Schedule Document """
         records = self.env['firm.document'].search([
