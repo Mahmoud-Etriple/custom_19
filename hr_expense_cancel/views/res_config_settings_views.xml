@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_expense_cancel" model="ir.ui.view">
+        <field name="name">res.config.settings.form.expense.cancel</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="hr_expense.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='expenses_setting_container']" position="inside">
+                <setting id="expense_cancel_setting"
+                         company_dependent="1"
+                         string="Expense Cancel Feature"
+                         help="Let authorised users cancel expenses that are already submitted, approved, posted or paid.">
+                    <field name="expense_cancel_enabled"/>
+                    <div class="content-group mt16" invisible="not expense_cancel_enabled">
+                        <field name="expense_cancel_mode" widget="radio"/>
+                        <div class="mt16">
+<!--                            <field name="expense_cancel_move_mode" widget="radio"/>-->
+                        </div>
+                    </div>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+</odoo>

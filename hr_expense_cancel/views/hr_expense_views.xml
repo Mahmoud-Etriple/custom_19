@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="hr_expense_view_form_cancel" model="ir.ui.view">
+        <field name="name">hr.expense.form.cancel</field>
+        <field name="model">hr.expense</field>
+        <field name="inherit_id" ref="hr_expense.hr_expense_view_form"/>
+        <field name="arch" type="xml">
+            <!--
+                Placed after core's Refuse button. Core's Refuse only appears
+                for submitted/approved and refuses without touching the
+                accounting; this one also covers posted, in_payment and paid.
+            -->
+            <xpath expr="//header/button[@name='action_refuse']" position="after">
+                <button name="action_expense_cancel" string="Cancel" type="object"
+                        class="o_expense_cancel"
+                        data-hotkey="z"
+                        groups="hr_expense_cancel.group_hr_expense_cancel"
+                        confirm="Cancel this expense? Any posted journal entry will be reversed."
+                        invisible="not expense_cancel_available"/>
+            </xpath>
+            <xpath expr="//header" position="inside">
+                <field name="expense_cancel_available" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_expense_view_list_cancel" model="ir.ui.view">
+        <field name="name">hr.expense.list.cancel</field>
+        <field name="model">hr.expense</field>
+        <field name="inherit_id" ref="hr_expense.hr_expense_view_expenses_analysis_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <header>
+                    <button name="action_expense_cancel" type="object"
+                            string="Cancel Expenses"
+                            groups="hr_expense_cancel.group_hr_expense_cancel"
+                            confirm="Cancel the selected expenses? Any posted journal entry will be reversed."/>
+                </header>
+            </xpath>
+        </field>
+    </record>
+</odoo>
