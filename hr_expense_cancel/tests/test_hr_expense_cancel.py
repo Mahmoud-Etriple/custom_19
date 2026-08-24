@@ -307,3 +307,52 @@ class TestCancelDeleteBlocked(TransactionCase):
             expense.exists(),
             "a refused cancel must leave the expense untouched",
         )
+
+
+@tagged("post_install", "-at_install")
+class TestExpenseCancelReturnValue(TransactionCase):
+    """What the button hands back to the web client.
+
+    An action dict reaches the browser and is executed there, so a wrong one
+    crashes the user *after* the work has succeeded - the hardest kind of
+    failure to connect to its cause. These assertions are about the shape of
+    that dict, not about the cancellation.
+    """
+
+    def test_no_empty_next_action_is_returned(self):
+        """{} is truthy in JavaScript.
+
+        The client runs `if (params.next) doAction(params.next)`. An empty
+        dict passes that test and then fails inside the action manager with
+        "can't handle actions of type undefined". Absent is not the same as
+        empty.
+        """
+        for mode in ("cancel", "cancel_draft"):
+            with self.subTest(mode=mode):
+                action = self.env["hr.expense"]._expense_cancel_notification(
+                    mode, ["EXP/001"])
+                self.assertNotIn(
+                    "next", action["params"],
+                    "no next action must be sent when there is nowhere to go",
+                )
+
+    def test_delete_mode_closes_the_form(self):
+        """Here the record is gone, so the client does have to be told."""
+        action = self.env["hr.expense"]._expense_cancel_notification(
+            "cancel_delete", ["EXP/001"])
+        self.assertEqual(
+            action["params"]["next"]["type"], "ir.actions.act_window_close")
+
+    def test_every_returned_action_carries_a_type(self):
+        for mode in ("cancel", "cancel_draft", "cancel_delete"):
+            with self.subTest(mode=mode):
+                action = self.env["hr.expense"]._expense_cancel_notification(
+                    mode, ["EXP/001"])
+                self.assertEqual(action["type"], "ir.actions.client")
+                self.assertTrue(action["params"].get("message"))
+                for key, value in action["params"].items():
+                    if isinstance(value, dict):
+                        self.assertTrue(
+                            value.get("type"),
+                            f"nested action under '{key}' has no type",
+                        )

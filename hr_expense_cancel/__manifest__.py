@@ -1,6 +1,6 @@
 {
     "name": "Cancel HR Expense",
-    "version": "19.0.1.2.0",
+    "version": "19.0.1.2.1",
     "category": "Human Resources/Expenses",
     "summary": "Cancel submitted, approved, posted or paid expenses",
     "description": """

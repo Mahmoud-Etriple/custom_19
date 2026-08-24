@@ -203,13 +203,30 @@ class HrExpense(models.Model):
                 "%s expense(s) cancelled and deleted.", len(names)
             ),
         }
+        params = {
+            "type": "success",
+            "message": messages.get(mode, messages["cancel"]),
+        }
+        # 'next' is only present when there is somewhere to go.
+        #
+        # It used to be set to {} on the other two modes, on the assumption
+        # that an empty action is the same as no action. It is not: the web
+        # client tests `params.next` for truthiness, and {} is truthy in
+        # JavaScript, so it handed the empty dict to doAction and the action
+        # manager refused an action whose type is undefined - "The
+        # ActionManager service can't handle actions of type undefined",
+        # raised after the cancellation had already succeeded and its
+        # notification had already been shown. The work was done and the user
+        # was looking at a crash dialog.
+        #
+        # Only 'cancel_delete' needs a next action, because the record the
+        # form is sitting on no longer exists and the client has to be told to
+        # leave. In the other two modes the record is still there and the
+        # client reloads it by itself.
+        if mode == "cancel_delete":
+            params["next"] = {"type": "ir.actions.act_window_close"}
         return {
             "type": "ir.actions.client",
             "tag": "display_notification",
-            "params": {
-                "type": "success",
-                "message": messages.get(mode, messages["cancel"]),
-                "next": {"type": "ir.actions.act_window_close"}
-                if mode == "cancel_delete" else {},
-            },
+            "params": params,
         }
