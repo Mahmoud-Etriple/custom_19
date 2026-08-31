@@ -51,8 +51,9 @@ class AccountGeneralLedger(models.TransientModel):
         account_dict = {}
         account_totals = {}
         move_line_ids = self.env['account.move.line'].search(
-            [('parent_state', '=', 'posted')])
-        account_ids = move_line_ids.mapped('account_id')
+            [('parent_state', '=', 'posted')],
+            order='date asc, move_name asc, id asc')
+        account_ids = move_line_ids.mapped('account_id').sorted()
         account_dict['journal_ids'] = self.env['account.journal'].search_read(
             [], ['name'])
         account_dict['analytic_ids'] = self.env[
@@ -170,8 +171,9 @@ class AccountGeneralLedger(models.TransientModel):
                 end_date = datetime.strptime(date_range['end_date'],
                                              '%Y-%m-%d').date()
                 domain += [('date', '<=', end_date)]
-        move_line_ids = self.env['account.move.line'].search(domain)
-        account_ids = move_line_ids.mapped('account_id')
+        move_line_ids = self.env['account.move.line'].search(
+            domain, order='date asc, move_name asc, id asc')
+        account_ids = move_line_ids.mapped('account_id').sorted()
         account_dict['journal_ids'] = self.env['account.journal'].search_read(
             [], ['name'])
         account_dict['analytic_ids'] = self.env[
@@ -277,7 +279,17 @@ class AccountGeneralLedger(models.TransientModel):
                 sheet.merge_range('L9:M9', 'Balance', sub_heading)
                 row = 8
                 if data['account']:
+                    totals = data.get('total') or {}
                     for account in data['account']:
+                        account_total = totals.get(account) or {}
+                        debit = account_total.get('total_debit') or 0.0
+                        credit = account_total.get('total_credit') or 0.0
+                        debit_display = account_total.get(
+                            'total_debit_display', debit)
+                        credit_display = account_total.get(
+                            'total_credit_display', credit)
+                        balance_display = account_total.get(
+                            'balance_display', debit - credit)
                         row += 1
                         sheet.write(row, col, account, txt_name)
                         sheet.write(row, col + 1, ' ', txt_name)
@@ -285,13 +297,13 @@ class AccountGeneralLedger(models.TransientModel):
                         sheet.merge_range(row, col + 5, row, col + 6, ' ',
                                           txt_name)
                         sheet.merge_range(row, col + 7, row, col + 8,
-                                          data['total'][account]['total_debit_display'],
+                                          debit_display,
                                           txt_name)
                         sheet.merge_range(row, col + 9, row, col + 10,
-                                          data['total'][account]['total_credit_display'],
+                                          credit_display,
                                           txt_name)
                         sheet.merge_range(row, col + 11, row, col + 12,
-                                          data['total'][account]['balance_display'],
+                                          balance_display,
                                           txt_name)
                         for rec in data['data'][account]:
                             row += 1
@@ -313,15 +325,19 @@ class AccountGeneralLedger(models.TransientModel):
                     row += 1
                     sheet.merge_range(row, col, row, col + 6, 'Total',
                                       filter_head)
+                    grand_total = data.get('grand_total') or {}
+                    grand_debit = float(grand_total.get('total_debit') or 0.0)
+                    grand_credit = float(grand_total.get('total_credit') or 0.0)
                     sheet.merge_range(row, col + 7, row, col + 8,
-                                      data['grand_total']['total_debit_display'],
+                                      grand_total.get('total_debit_display')
+                                      or grand_debit,
                                       filter_head)
                     sheet.merge_range(row, col + 9, row, col + 10,
-                                      data['grand_total']['total_credit_display'],
+                                      grand_total.get('total_credit_display')
+                                      or grand_credit,
                                       filter_head)
                     sheet.merge_range(row, col + 11, row, col + 12,
-                                      float(data['grand_total']['total_debit']) -
-                                      float(data['grand_total']['total_credit']),
+                                      grand_debit - grand_credit,
                                       filter_head)
         workbook.close()
         output.seek(0)

@@ -307,24 +307,36 @@ class GeneralLedger extends owl.Component {
             }
         }
         let filtered_data = await this.orm.call("account.general.ledger", "get_filter_values", [this.state.selected_journal_list, this.state.date_range, this.state.options, this.state.selected_analytic_list,this.state.method]);
+        let currency;
         for (let index in filtered_data) {
-             const value = filtered_data[index];
-            if (index !== 'account_totals' && index !== 'journal_ids' && index !== 'analytic_ids') {
-                account_list.push(index)
-            }
-            else {
+            const value = filtered_data[index];
+            if (index === 'journal_ids') {
+                this.state.journals = value
+            } else if (index === 'analytic_ids') {
+                this.state.analytics = value
+            } else if (index === 'account_totals') {
                 account_totals = value
-                Object.values(account_totals).forEach(account_list => {
-                        totalDebitSum += account_list.total_debit || 0;
-                        totalCreditSum += account_list.total_credit || 0;
-                    });
+                Object.values(account_totals).forEach(total => {
+                    currency = total.currency_id
+                    totalDebitSum += total.total_debit || 0;
+                    total.total_debit_display = this.formatNumberWithSeparators(total.total_debit || 0);
+                    totalCreditSum += total.total_credit || 0;
+                    total.total_credit_display = this.formatNumberWithSeparators(total.total_credit || 0);
+                    let balance = (total.total_debit || 0) - (total.total_credit || 0);
+                    total.balance_display = this.formatNumberWithSeparators(balance);
+                });
+            } else {
+                account_list.push(index)
             }
         }
         this.state.account = account_list
         this.state.account_data = filtered_data
         this.state.account_total = account_totals
+        this.state.currency = currency
         this.state.total_debit = totalDebitSum.toFixed(2)
+        this.state.total_debit_display = this.formatNumberWithSeparators(this.state.total_debit)
         this.state.total_credit = totalCreditSum.toFixed(2)
+        this.state.total_credit_display = this.formatNumberWithSeparators(this.state.total_credit)
         if (this.unfoldButton.el.classList.contains("selected-filter")) {
             this.unfoldButton.el.classList.remove("selected-filter");
         }
