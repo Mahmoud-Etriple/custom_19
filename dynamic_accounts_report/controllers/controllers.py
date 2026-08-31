@@ -32,7 +32,8 @@ _logger = logging.getLogger(__name__)
 class XLSXReportController(http.Controller):
     @http.route('/xlsx_report', type='http', auth='user', methods=['POST'],
                 csrf=False)
-    def get_report_xlsx(self, model, data, output_format, report_name, report_action, options=None):
+    def get_report_xlsx(self, model, data, output_format, report_name,
+                        report_action, options=None, **kwargs):
         """Generate an XLSX report based on the provided data and return it as
         a response.
             Args:
@@ -49,7 +50,7 @@ class XLSXReportController(http.Controller):
             """
         uid = request.session.uid
         report_obj = request.env[model].with_user(uid)
-        token = 'dummy-because-api-expects-one'
+        token = kwargs.get('token', 'dummy-because-api-expects-one')
         try:
             if output_format == 'xlsx':
                 response = request.make_response(
