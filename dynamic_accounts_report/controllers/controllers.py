@@ -30,7 +30,8 @@ _logger = logging.getLogger(__name__)
 
 
 class XLSXReportController(http.Controller):
-    @http.route('/xlsx_report', type='http', auth='user', methods=['POST'],
+    @http.route('/dynamic_accounts_xlsx_report', type='http', auth='user',
+                methods=['POST'],
                 csrf=False)
     def get_report_xlsx(self, model, data, output_format, report_name,
                         report_action, options=None, **kwargs):
