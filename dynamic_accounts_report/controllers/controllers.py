@@ -20,9 +20,13 @@
 #
 ################################################################################
 import json
+import logging
+import traceback
 from odoo import http
 from odoo.http import content_disposition, request
 from odoo.tools import html_escape
+
+_logger = logging.getLogger(__name__)
 
 
 class XLSXReportController(http.Controller):
@@ -61,10 +65,20 @@ class XLSXReportController(http.Controller):
             response.set_cookie('fileToken', token)
             return response
         except Exception as e:
-            se = http.serialize_exception(e)
+            _logger.exception(
+                "Dynamic report XLSX generation failed for model %s "
+                "(report_action=%s)", model, report_action)
             error = {
                 'code': 200,
                 'message': 'Odoo Server Error',
-                'data': se
+                'data': {
+                    'name': '%s.%s' % (type(e).__module__, type(e).__name__),
+                    'message': str(e),
+                    'arguments': [str(arg) for arg in e.args],
+                    'context': {},
+                    'debug': ''.join(
+                        traceback.format_exception(
+                            type(e), e, e.__traceback__)),
+                },
             }
             return request.make_response(html_escape(json.dumps(error)))
