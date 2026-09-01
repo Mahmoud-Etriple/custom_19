@@ -16,6 +16,7 @@ import { PycusAgeingReportFilters } from "../pycus_ageing_report/pycus_ageing_re
 export class PycusAgeingReport extends Component {
     setup(){
         this.ormService = useService("orm");
+        this.notification = useService("notification");
         this.action = useService("action");
         this.state = useState({
             activeId: 0,
@@ -45,7 +46,12 @@ export class PycusAgeingReport extends Component {
                 this.state.activeId = glWizardId
                 this.readGlWizard(glWizardId);
             } catch (error) {
-                console.log("Error on GL Creation", error)
+                // Odoo 19 migration: surface server errors instead of rendering an empty table
+                this.notification.add(
+                    error?.data?.message || error?.message || String(error),
+                    { title: "Report failed", type: "danger", sticky: true }
+                );
+                console.error("Error on GL Creation", error);
             }
         };
 
@@ -54,6 +60,11 @@ export class PycusAgeingReport extends Component {
                 const record = await this.ormService.call('ins.partner.ageing', 'prepare_values_for_component', [this.state.activeId]); // Choose relevant fields
                 this.state.filterValues = record
               } catch (error) {
+                // Odoo 19 migration: surface server errors instead of rendering an empty table
+                this.notification.add(
+                    error?.data?.message || error?.message || String(error),
+                    { title: "Report failed", type: "danger", sticky: true }
+                );
                 console.error("Error reading record:", error);
               }
         };
@@ -69,6 +80,11 @@ export class PycusAgeingReport extends Component {
                 this.state.ageing_lines = ageing_data[1]
                 this.readGlWizard()
               } catch (error) {
+                // Odoo 19 migration: surface server errors instead of rendering an empty table
+                this.notification.add(
+                    error?.data?.message || error?.message || String(error),
+                    { title: "Report failed", type: "danger", sticky: true }
+                );
                 console.error("Error reading record:", error);
               }
             this.hideSpinner()

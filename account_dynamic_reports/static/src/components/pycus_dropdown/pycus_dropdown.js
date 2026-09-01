@@ -67,7 +67,8 @@ export class PycusDropdown extends Component {
         this.fetchOptions = async (term = '') => {
             const options = await this.ormService.call(this.props.tableName, "name_search", [], {
                 name: term,
-                args: [],
+                // Odoo 19 renamed the name_search 'args' kwarg to 'domain'
+                domain: [],
                 operator: "ilike",
                 limit: 80,
                 context: {},
