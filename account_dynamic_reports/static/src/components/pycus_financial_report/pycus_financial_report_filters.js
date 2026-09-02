@@ -54,13 +54,23 @@ export class PycusFinancialReportFilters extends PycusFilters {
         }
     }
 
+    markComparisonRangeCustom() {
+        // Same rule as the main range: hand-picked comparison dates only survive
+        // Apply if the comparison range is set to Custom.
+        if (this.state.comparison_date_range && this.state.comparison_date_range.selectedValue) {
+            this.state.comparison_date_range.selectedValue.value = 'custom';
+        }
+    }
+
     onComparisonDateFromChanged(dateFrom) {
         this.state.comparison_date_from = dateFrom
+        this.markComparisonRangeCustom()
         this.props.updateValues(this)
     }
 
     onComparisonDateToChanged(dateTo) {
         this.state.comparison_date_to = dateTo
+        this.markComparisonRangeCustom()
         this.props.updateValues(this)
     }
 }

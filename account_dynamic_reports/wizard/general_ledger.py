@@ -42,6 +42,9 @@ class InsGeneralLedger(models.TransientModel):
 
     @api.onchange('date_range','financial_year')
     def onchange_date_range(self):
+        # 'custom' means the user picked the dates by hand: leave them alone.
+        if self.date_range == 'custom':
+            return
         if self.date_range:
             date = datetime.today()
             if self.date_range == 'today':
@@ -156,7 +159,8 @@ class InsGeneralLedger(models.TransientModel):
          ('last_week', 'Last Week'),
          ('last_month', 'Last Month'),
          ('last_quarter', 'Last Quarter'),
-         ('last_financial_year', 'Last Financial Year')],
+         ('last_financial_year', 'Last Financial Year'),
+         ('custom', 'Custom')],
         string='Date Range', default=_get_default_date_range
     )
     target_moves = fields.Selection(

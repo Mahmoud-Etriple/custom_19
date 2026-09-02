@@ -52,6 +52,9 @@ class InsFinancialReport(models.TransientModel):
 
     @api.onchange('date_range', 'financial_year')
     def onchange_date_range(self):
+        # 'custom' means the user picked the dates by hand: leave them alone.
+        if self.date_range == 'custom':
+            return
         if self.date_range:
             date = datetime.today()
             if self.date_range == 'today':
@@ -144,6 +147,9 @@ class InsFinancialReport(models.TransientModel):
 
     @api.onchange('comparison_date_range', 'financial_year')
     def onchange_comparison_date_range(self):
+        # 'custom' means the user picked the dates by hand: leave them alone.
+        if self.comparison_date_range == 'custom':
+            return
         if self.comparison_date_range:
             date = datetime.today()
             if self.comparison_date_range == 'today':
@@ -502,7 +508,8 @@ class InsFinancialReport(models.TransientModel):
          ('last_week', 'Last Week'),
          ('last_month', 'Last Month'),
          ('last_quarter', 'Last Quarter'),
-         ('last_financial_year', 'Last Financial Year')],
+         ('last_financial_year', 'Last Financial Year'),
+         ('custom', 'Custom')],
         string='Date Range', default=_get_default_date_range
     )
     comparison_date_range = fields.Selection(
@@ -515,7 +522,8 @@ class InsFinancialReport(models.TransientModel):
          ('last_week', 'Last Week'),
          ('last_month', 'Last Month'),
          ('last_quarter', 'Last Quarter'),
-         ('last_financial_year', 'Last Financial Year')],
+         ('last_financial_year', 'Last Financial Year'),
+         ('custom', 'Custom')],
         string='Date Range'
     )
     view_format = fields.Selection([

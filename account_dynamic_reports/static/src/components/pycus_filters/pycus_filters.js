@@ -79,13 +79,24 @@ export class PycusFilters extends Component {
         this.props.updateValues(this)
     }
 
+    markDateRangeCustom() {
+        // Picking a date by hand switches the range to Custom. Without this the
+        // server recomputes date_from/date_to from the named range on Apply and
+        // the hand-picked dates are silently discarded.
+        if (this.state.date_range && this.state.date_range.selectedValue) {
+            this.state.date_range.selectedValue.value = 'custom';
+        }
+    }
+
     onDateFromChanged(dateFrom) {
         this.state.date_from = dateFrom
+        this.markDateRangeCustom()
         this.props.updateValues(this)
     }
 
     onDateToChanged(dateTo) {
         this.state.date_to = dateTo
+        this.markDateRangeCustom()
         this.props.updateValues(this)
     }
 
