@@ -10,6 +10,7 @@
     'sequence': 1,
     'depends': [
         'base',
+        'account',
         'sale',
         'crm',
         'stock',
@@ -25,6 +26,7 @@
         # 'report/',
         #'wizard/',
         'views/firm_contract.xml',
+        'views/firm_invoice_config.xml',
         'views/hr_expense.xml',
         'views/account_move.xml',
         'views/project.xml',

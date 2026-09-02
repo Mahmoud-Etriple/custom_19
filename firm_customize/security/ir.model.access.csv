@@ -8,6 +8,8 @@ firm.document.type.user,firm.document.type.user,model_firm_document_type,firm_cu
 service.type.user,service.type.user,model_service_type,firm_customize.group_user,1,1,1,0
 firm.document.tag.user,firm.document.tag.user,model_firm_document_tag,firm_customize.group_user,1,1,1,0
 issuing_office.user,issuing_office.user,model_issuing_office,firm_customize.group_user,1,1,1,0
+firm.payment.plan.user,firm.payment.plan.user,model_firm_payment_plan,firm_customize.group_user,1,1,1,0
+firm.invoice.config.user,firm.invoice.config.user,model_firm_invoice_config,firm_customize.group_user,1,1,1,0
 
 firm.contract.supervisor,firm.contract.supervisor,model_firm_contract,firm_customize.group_supervisor,1,1,1,0
 firm.document.supervisor,firm.document.supervisor,model_firm_document,firm_customize.group_supervisor,1,1,1,0
@@ -18,6 +20,8 @@ firm.document.type.supervisor,firm.document.type.supervisor,model_firm_document_
 service.type.supervisor,service.type.supervisor,model_service_type,firm_customize.group_supervisor,1,1,1,0
 firm.document.tag.supervisor,firm.document.tag.supervisor,model_firm_document_tag,firm_customize.group_supervisor,1,1,1,0
 issuing_office.supervisor,issuing_office.supervisor,model_issuing_office,firm_customize.group_supervisor,1,1,1,0
+firm.payment.plan.supervisor,firm.payment.plan.supervisor,model_firm_payment_plan,firm_customize.group_supervisor,1,1,1,0
+firm.invoice.config.supervisor,firm.invoice.config.supervisor,model_firm_invoice_config,firm_customize.group_supervisor,1,1,1,0
 
 firm.contract.admin,firm.contract.admin,model_firm_contract,firm_customize.group_admin,1,1,1,1
 firm.document.admin,firm.document.admin,model_firm_document,firm_customize.group_admin,1,1,1,1
@@ -28,3 +32,5 @@ firm.document.type.admin,firm.document.type.admin,model_firm_document_type,firm_
 service.type.admin,service.type.admin,model_service_type,firm_customize.group_admin,1,1,1,1
 firm.document.tag.admin,firm.document.tag.admin,model_firm_document_tag,firm_customize.group_admin,1,1,1,1
 issuing_office.admin,issuing_office.admin,model_issuing_office,firm_customize.group_admin,1,1,1,1
+firm.payment.plan.admin,firm.payment.plan.admin,model_firm_payment_plan,firm_customize.group_admin,1,1,1,1
+firm.invoice.config.admin,firm.invoice.config.admin,model_firm_invoice_config,firm_customize.group_admin,1,1,1,1

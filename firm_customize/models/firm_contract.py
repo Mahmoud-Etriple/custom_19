@@ -2,8 +2,9 @@
 
 from dateutil.relativedelta import relativedelta
 
-from odoo import _, api, fields, models
+from odoo import _, api, fields, models, Command
 from odoo.exceptions import UserError, ValidationError
+from odoo.tools import float_round
 from datetime import timedelta
 
 
@@ -158,6 +159,44 @@ class FirmContract(models.Model):
         # compute='_compute_service_tag_ids'
     )
 
+    invoice_config_id = fields.Many2one(
+        'firm.invoice.config',
+        string='Invoice Configuration',
+        domain="[('model_name', '=', 'firm.contract')]",
+    )
+    no_of_invoices = fields.Integer(
+        string='No. Of Invoices',
+        compute='_compute_invoice_config_values',
+        store=True,
+        readonly=False,
+    )
+    payment_term_id = fields.Many2one(
+        'account.payment.term',
+        compute='_compute_invoice_config_values',
+        store=True,
+        readonly=False,
+    )
+    payment_plan_id = fields.Many2one(
+        'firm.payment.plan',
+        compute='_compute_invoice_config_values',
+        store=True,
+        readonly=False,
+    )
+
+    @api.depends('invoice_config_id')
+    def _compute_invoice_config_values(self):
+        """
+            Compute the invoicing values out of the selected configuration.
+            Stored and editable: the configuration provides the value, the
+            user may still override it on the contract without writing the
+            change back to the configuration record.
+        """
+        for rec in self:
+            config = rec.invoice_config_id
+            rec.no_of_invoices = config.no_of_invoices if config else 1
+            rec.payment_term_id = config.payment_term_id if config else False
+            rec.payment_plan_id = config.payment_plan_id if config else False
+
     # @api.onchange('service_type_ids')
     # def _check_service_type_ids(self):
     #     """ Validate service_type_ids """
@@ -295,7 +334,7 @@ class FirmContract(models.Model):
             'view_mode': 'list,form',
             'domain': [('firm_contract_id', '=', self.id),('move_type', '=', 'in_invoice')],
             'context': {
-                'default_partner_id': self.id,
+                'default_partner_id': self.partner_id.id,
                 'default_firm_contract_id': self.id,
                 'default_move_type': 'in_invoice',
             },
@@ -310,7 +349,7 @@ class FirmContract(models.Model):
             'view_mode': 'list,form',
             'domain': [('firm_contract_id', '=', self.id),('move_type', '=', 'out_invoice')],
             'context': {
-                'default_partner_id': self.id,
+                'default_partner_id': self.partner_id.id,
                 'default_firm_contract_id': self.id,
                 'default_move_type': 'out_invoice',
             },
@@ -356,6 +395,106 @@ class FirmContract(models.Model):
                         'analytic_distribution': {rec.analytic_account_id.id: 100}
                     })
                 sale.action_confirm()
+
+    def _get_invoice_line_amounts(self, count):
+        """
+            Split every service line total over the requested invoice count.
+            Returns {service_line_id: (regular_amount, last_invoice_amount)};
+            the last invoice absorbs the rounding residual so the sum of the
+            generated invoices always equals the contract total.
+        """
+        self.ensure_one()
+        rounding = self.env.company.currency_id.rounding
+        amounts = {}
+        for line in self.firm_services_ids:
+            total = line.price * line.quantity
+            regular = float_round(total / count, precision_rounding=rounding)
+            residual = float_round(
+                total - (regular * (count - 1)), precision_rounding=rounding
+            )
+            amounts[line.id] = (regular, residual)
+        return amounts
+
+    def _prepare_firm_invoice_vals(self, index, count, amounts):
+        """ Build the values of one generated customer invoice """
+        self.ensure_one()
+        analytic_distribution = False
+        if self.analytic_account_id:
+            analytic_distribution = {str(self.analytic_account_id.id): 100}
+        invoice_lines = []
+        for line in self.firm_services_ids:
+            regular, residual = amounts[line.id]
+            line_vals = {
+                'name': line.scope or line.product_id.display_name,
+                'quantity': 1,
+                'price_unit': residual if index == count - 1 else regular,
+            }
+            if line.product_id:
+                line_vals['product_id'] = line.product_id.id
+                line_vals['product_uom_id'] = line.product_id.uom_id.id
+            if analytic_distribution:
+                line_vals['analytic_distribution'] = analytic_distribution
+            invoice_lines.append(Command.create(line_vals))
+        return {
+            'move_type': 'out_invoice',
+            'partner_id': self.partner_id.id,
+            'firm_contract_id': self.id,
+            'invoice_origin': self.name,
+            'invoice_payment_term_id': self.payment_term_id.id,
+            'invoice_line_ids': invoice_lines,
+        }
+
+    def action_create_invoices(self):
+        """
+            Action Create Invoices:
+             - one invoice per unit of no_of_invoices
+             - every contract service line is invoiced with quantity 1
+             - the line price is the line total divided by no_of_invoices
+             - every invoice stays linked to the contract
+        """
+        self.ensure_one()
+        if not self.invoice_config_id:
+            raise UserError(_(
+                'Select an Invoice Configuration on the contract '
+                'before creating invoices.'
+            ))
+        if not self.partner_id:
+            raise UserError(_(
+                'Set the customer on the contract before creating invoices.'
+            ))
+        if not self.firm_services_ids:
+            raise UserError(_(
+                'Add at least one service line before creating invoices.'
+            ))
+        count = self.no_of_invoices
+        if count < 1:
+            raise UserError(_('The number of invoices must be at least 1.'))
+        for line in self.firm_services_ids:
+            if not line.product_id and not line.scope:
+                raise UserError(_(
+                    'Every service line needs a product or a scope '
+                    'before invoices can be created.'
+                ))
+        existing = self.env['account.move'].search_count([
+            ('firm_contract_id', '=', self.id),
+            ('move_type', '=', 'out_invoice'),
+        ])
+        if existing:
+            raise UserError(_(
+                'Customer invoices already exist for contract %s. '
+                'Delete or cancel them before creating new ones.',
+                self.name or ''
+            ))
+        amounts = self._get_invoice_line_amounts(count)
+        invoices = self.env['account.move']
+        for index in range(count):
+            invoices |= self.env['account.move'].create(
+                self._prepare_firm_invoice_vals(index, count, amounts)
+            )
+        self.message_post(
+            body=_('%s customer invoice(s) created from the contract.', count)
+        )
+        return self.action_view_invoice()
 
 
 class FirmDocument(models.Model):

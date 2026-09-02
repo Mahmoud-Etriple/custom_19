@@ -19,6 +19,10 @@
                     <button name="action_draft" string="Set Draft" type="object"
                             invisible="state != 'cancel'"
                             class="oe_highlight"/>
+                    <button name="action_create_invoices" string="Create Invoices" type="object"
+                            invisible="state not in ['approve', 'done']"
+                            groups="firm_customize.group_admin"
+                            class="oe_highlight"/>
                     <field name="state" widget="statusbar" />
                 </header>
                 <sheet>
@@ -129,6 +133,10 @@
 
                             <field name="industry_id"/>
                             <field name="industry_code"/>
+                            <field name="invoice_config_id" options="{'no_create': True}"/>
+                            <field name="no_of_invoices"/>
+                            <field name="payment_term_id"/>
+                            <field name="payment_plan_id"/>
                         </group>
                     </group>
                     <notebook>
