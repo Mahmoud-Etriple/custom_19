@@ -5,7 +5,9 @@ from dateutil.relativedelta import relativedelta
 from odoo import _, api, fields, models, Command
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_round
-from datetime import timedelta
+from datetime import date, timedelta
+import calendar
+import math
 
 
 class FirmContract(models.Model):
@@ -161,41 +163,59 @@ class FirmContract(models.Model):
 
     invoice_config_id = fields.Many2one(
         'firm.invoice.config',
-        string='Invoice Configuration',
+        string='Automatic Invoice Plan',
         domain="[('model_name', '=', 'firm.contract')]",
+    )
+    payment_plan_id = fields.Many2one(
+        'firm.payment.plan',
+        string='Plan',
+        domain="[('invoice_config_id', '=', invoice_config_id)]",
     )
     no_of_invoices = fields.Integer(
         string='No. Of Invoices',
-        compute='_compute_invoice_config_values',
+        compute='_compute_plan_values',
         store=True,
         readonly=False,
     )
     payment_term_id = fields.Many2one(
         'account.payment.term',
-        compute='_compute_invoice_config_values',
-        store=True,
-        readonly=False,
-    )
-    payment_plan_id = fields.Many2one(
-        'firm.payment.plan',
-        compute='_compute_invoice_config_values',
+        compute='_compute_plan_values',
         store=True,
         readonly=False,
     )
 
-    @api.depends('invoice_config_id')
-    def _compute_invoice_config_values(self):
+    @api.depends('payment_plan_id')
+    def _compute_plan_values(self):
         """
-            Compute the invoicing values out of the selected configuration.
-            Stored and editable: the configuration provides the value, the
-            user may still override it on the contract without writing the
-            change back to the configuration record.
+            Compute the invoicing values out of the selected plan.
+            Stored and editable: the plan provides the value, the user may
+            still override it on the contract without writing the change
+            back to the plan record.
         """
         for rec in self:
-            config = rec.invoice_config_id
-            rec.no_of_invoices = config.no_of_invoices if config else 1
-            rec.payment_term_id = config.payment_term_id if config else False
-            rec.payment_plan_id = config.payment_plan_id if config else False
+            plan = rec.payment_plan_id
+            rec.no_of_invoices = plan.no_of_invoices if plan else 1
+            rec.payment_term_id = plan.payment_term_id if plan else False
+
+    @api.onchange('invoice_config_id')
+    def _onchange_invoice_config_id(self):
+        """ Drop a plan that no longer belongs to the selected plan header """
+        for rec in self:
+            if rec.payment_plan_id.invoice_config_id != rec.invoice_config_id:
+                rec.payment_plan_id = False
+
+    @api.constrains('invoice_config_id', 'payment_plan_id')
+    def _check_payment_plan_id(self):
+        """ Keep the plan consistent with its automatic invoice plan """
+        for rec in self:
+            if rec.payment_plan_id and \
+                    rec.payment_plan_id.invoice_config_id != rec.invoice_config_id:
+                raise ValidationError(_(
+                    'The plan %(plan)s does not belong to the automatic '
+                    'invoice plan %(config)s.',
+                    plan=rec.payment_plan_id.display_name,
+                    config=rec.invoice_config_id.display_name or _('not set'),
+                ))
 
     # @api.onchange('service_type_ids')
     # def _check_service_type_ids(self):
@@ -415,7 +435,35 @@ class FirmContract(models.Model):
             amounts[line.id] = (regular, residual)
         return amounts
 
-    def _prepare_firm_invoice_vals(self, index, count, amounts):
+    def _get_invoice_dates(self, count):
+        """
+            Return the invoice date of every generated invoice.
+
+            The twelve months of the contract start year are split into
+            count equal periods and each invoice is dated on the last day
+            of its own period, so 4 invoices fall on the quarter ends and
+            12 invoices on every month end. Counts that do not divide 12
+            are spread evenly and rounded to the nearest month end. Above
+            twelve invoices the schedule keeps running month by month into
+            the following years.
+        """
+        self.ensure_one()
+        anchor = self.start_date or fields.Date.context_today(self)
+        dates = []
+        for index in range(1, count + 1):
+            if count > 12:
+                month_offset = index
+            else:
+                month_offset = int(math.floor((index * 12.0 / count) + 0.5))
+            year_shift, month_index = divmod(month_offset - 1, 12)
+            year = anchor.year + year_shift
+            month = month_index + 1
+            dates.append(
+                date(year, month, calendar.monthrange(year, month)[1])
+            )
+        return dates
+
+    def _prepare_firm_invoice_vals(self, index, count, amounts, invoice_date):
         """ Build the values of one generated customer invoice """
         self.ensure_one()
         analytic_distribution = False
@@ -439,6 +487,7 @@ class FirmContract(models.Model):
             'move_type': 'out_invoice',
             'partner_id': self.partner_id.id,
             'firm_contract_id': self.id,
+            'invoice_date': invoice_date,
             'invoice_origin': self.name,
             'invoice_payment_term_id': self.payment_term_id.id,
             'invoice_line_ids': invoice_lines,
@@ -455,8 +504,12 @@ class FirmContract(models.Model):
         self.ensure_one()
         if not self.invoice_config_id:
             raise UserError(_(
-                'Select an Invoice Configuration on the contract '
+                'Select an Automatic Invoice Plan on the contract '
                 'before creating invoices.'
+            ))
+        if not self.payment_plan_id:
+            raise UserError(_(
+                'Select a Plan on the contract before creating invoices.'
             ))
         if not self.partner_id:
             raise UserError(_(
@@ -486,10 +539,13 @@ class FirmContract(models.Model):
                 self.name or ''
             ))
         amounts = self._get_invoice_line_amounts(count)
+        invoice_dates = self._get_invoice_dates(count)
         invoices = self.env['account.move']
         for index in range(count):
             invoices |= self.env['account.move'].create(
-                self._prepare_firm_invoice_vals(index, count, amounts)
+                self._prepare_firm_invoice_vals(
+                    index, count, amounts, invoice_dates[index]
+                )
             )
         self.message_post(
             body=_('%s customer invoice(s) created from the contract.', count)

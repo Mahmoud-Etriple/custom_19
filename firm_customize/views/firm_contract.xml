@@ -134,9 +134,9 @@
                             <field name="industry_id"/>
                             <field name="industry_code"/>
                             <field name="invoice_config_id" options="{'no_create': True}"/>
+                            <field name="payment_plan_id" options="{'no_create': True}"/>
                             <field name="no_of_invoices"/>
                             <field name="payment_term_id"/>
-                            <field name="payment_plan_id"/>
                         </group>
                     </group>
                     <notebook>

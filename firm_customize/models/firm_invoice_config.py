@@ -1,42 +1,17 @@
-""" Initialize Firm Invoice Configuration """
+""" Initialize Firm Automatic Invoice Plan """
 
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
 
-class FirmPaymentPlan(models.Model):
-    """
-        Initialize Firm Payment Plan:
-         - Configuration list of payment plans referenced by the invoice
-           configuration and by the firm contract.
-    """
-    _name = 'firm.payment.plan'
-    _description = 'Firm Payment Plan'
-    _order = 'name'
-
-    name = fields.Char(
-        required=True,
-        translate=True,
-    )
-    active = fields.Boolean(
-        default=True
-    )
-
-    _sql_constraints = [
-        ('firm_payment_plan_name_uniq',
-         'unique(name)',
-         'The payment plan name must be unique.'),
-    ]
-
-
 class FirmInvoiceConfig(models.Model):
     """
-        Initialize Firm Invoice Configuration:
-         - Holds, per target model, how many invoices are generated and which
-           payment term / payment plan applies.
+        Initialize Firm Automatic Invoice Plan:
+         - Names an automatic invoicing scheme and the model it applies to.
+         - The invoicing figures themselves live on its plans.
     """
     _name = 'firm.invoice.config'
-    _description = 'Firm Invoice Configuration'
+    _description = 'Automatic Invoice Plan'
     _order = 'name'
 
     name = fields.Char(
@@ -57,17 +32,45 @@ class FirmInvoiceConfig(models.Model):
         readonly=True,
         string='Model Technical Name',
     )
+
+
+class FirmPaymentPlan(models.Model):
+    """
+        Initialize Firm Plan:
+         - Carries the invoicing figures of an automatic invoice plan:
+           payment term and number of invoices.
+    """
+    _name = 'firm.payment.plan'
+    _description = 'Plan'
+    _order = 'invoice_config_id, name'
+
+    name = fields.Char(
+        required=True,
+        translate=True,
+    )
+    active = fields.Boolean(
+        default=True
+    )
+    invoice_config_id = fields.Many2one(
+        'firm.invoice.config',
+        string='Automatic Invoice Plan',
+        required=True,
+        ondelete='cascade',
+    )
+    payment_term_id = fields.Many2one(
+        'account.payment.term',
+    )
     no_of_invoices = fields.Integer(
         string='No. Of Invoices',
         default=1,
         required=True,
     )
-    payment_term_id = fields.Many2one(
-        'account.payment.term',
-    )
-    payment_plan_id = fields.Many2one(
-        'firm.payment.plan',
-    )
+
+    _sql_constraints = [
+        ('firm_payment_plan_name_uniq',
+         'unique(invoice_config_id, name)',
+         'The plan name must be unique inside an automatic invoice plan.'),
+    ]
 
     @api.constrains('no_of_invoices')
     def _check_no_of_invoices(self):

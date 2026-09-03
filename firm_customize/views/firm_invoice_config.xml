@@ -1,21 +1,5 @@
 <data>
 
-    <record id="firm_payment_plan_tree" model="ir.ui.view">
-        <field name="name">firm.payment.plan.tree</field>
-        <field name="model">firm.payment.plan</field>
-        <field name="arch" type="xml">
-            <list editable="bottom">
-                <field name="name"/>
-            </list>
-        </field>
-    </record>
-
-    <record id="firm_payment_plan_action" model="ir.actions.act_window">
-        <field name="name">Payment Plan</field>
-        <field name="res_model">firm.payment.plan</field>
-        <field name="view_mode">list,form</field>
-    </record>
-
     <record id="firm_invoice_config_form" model="ir.ui.view">
         <field name="name">firm.invoice.config.form</field>
         <field name="model">firm.invoice.config</field>
@@ -23,16 +7,9 @@
             <form>
                 <sheet>
                     <group>
-                        <group>
-                            <field name="name"/>
-                            <field name="model_id" options="{'no_create': True}"/>
-                            <field name="model_name" invisible="1"/>
-                        </group>
-                        <group>
-                            <field name="no_of_invoices"/>
-                            <field name="payment_term_id"/>
-                            <field name="payment_plan_id"/>
-                        </group>
+                        <field name="name"/>
+                        <field name="model_id" options="{'no_create': True}"/>
+                        <field name="model_name" invisible="1"/>
                     </group>
                 </sheet>
             </form>
@@ -46,29 +23,71 @@
             <list>
                 <field name="name"/>
                 <field name="model_id"/>
-                <field name="no_of_invoices"/>
-                <field name="payment_term_id"/>
-                <field name="payment_plan_id"/>
             </list>
         </field>
     </record>
 
     <record id="firm_invoice_config_action" model="ir.actions.act_window">
-        <field name="name">Invoice Configuration</field>
+        <field name="name">Automatic Invoice Plan</field>
         <field name="res_model">firm.invoice.config</field>
         <field name="view_mode">list,form</field>
     </record>
 
-    <menuitem id="firm_invoice_config_menu"
-              name="Invoice Configuration"
-              action="firm_invoice_config_action"
+    <record id="firm_payment_plan_form" model="ir.ui.view">
+        <field name="name">firm.payment.plan.form</field>
+        <field name="model">firm.payment.plan</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="invoice_config_id" options="{'no_create': True}"/>
+                        </group>
+                        <group>
+                            <field name="payment_term_id"/>
+                            <field name="no_of_invoices"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="firm_payment_plan_tree" model="ir.ui.view">
+        <field name="name">firm.payment.plan.tree</field>
+        <field name="model">firm.payment.plan</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="invoice_config_id"/>
+                <field name="payment_term_id"/>
+                <field name="no_of_invoices"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="firm_payment_plan_action" model="ir.actions.act_window">
+        <field name="name">Plans</field>
+        <field name="res_model">firm.payment.plan</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="firm_automatic_invoice_plan_menu"
+              name="Automatic Invoice Plan"
               parent="configuration_menu"
               sequence="40"/>
 
+    <menuitem id="firm_invoice_config_menu"
+              name="Automatic Invoice Plan"
+              action="firm_invoice_config_action"
+              parent="firm_automatic_invoice_plan_menu"
+              sequence="10"/>
+
     <menuitem id="firm_payment_plan_menu"
-              name="Payment Plan"
+              name="Plans"
               action="firm_payment_plan_action"
-              parent="configuration_menu"
-              sequence="50"/>
+              parent="firm_automatic_invoice_plan_menu"
+              sequence="20"/>
 
 </data>
